@@ -117,9 +117,7 @@ class Robot : public frc::TimedRobot {
 
 		Drivetrain m_swerve{};
 
-		Mechanism m_somethingMachine{};
-
-		
+		Mechanism m_cubeArm{};
 
 		frc::Translation2d centerOfRotation = {0_m,0_m};
 		units::angular_velocity::degrees_per_second_t rotation = 0_deg_per_s;

@@ -27,15 +27,15 @@ void Robot::TeleopInit() {
 }
 void Robot::TeleopPeriodic() {
 	// Reset Gyro
-	if(m_Joystick.GetPOV() != -1){
+	if(m_Joystick.GetRawButton(2)){
 		gyro->Reset();
 	}
 
 	// Get joystick inputs and calculate throttle
 	double j_forward = m_Joystick.GetY();
 	double j_strafe = -m_Joystick.GetX();
-	double j_rotate = m_Joystick.GetTwist();
-	double throttle = ((1 - ((m_Joystick.GetThrottle() + 1) / 2)) * frc::SmartDashboard::GetNumber("Max Speed", 1));
+	double j_rotate = m_Joystick.GetRawAxis(5);
+	double throttle = ((1 - ((m_Joystick.GetZ() + 1) / 2)) * frc::SmartDashboard::GetNumber("Max Speed", 1));
 
 	// Calculate swerve module inputs
 	const auto forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(j_forward, 0.2)) * throttle) * kMaxSpeed;
@@ -43,16 +43,18 @@ void Robot::TeleopPeriodic() {
 	const auto rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(j_rotate, 0.3)) * sqrt(throttle));
 
 	// Determine center of rotation based on button input
-	int rotateAtPosition[1] {m_Joystick.GetRawButton(1)};
-	auto [t] = rotateAtPosition;
-	if (t > 0) {
+	if (m_Joystick.GetRawButton(1) && !m_Joystick.GetRawButton(15)) {
+		// Tower (center of mass)
+		centerOfRotation = kCenterOfMass;
+		rotation = rotate * kMediumRotation;
+	}else if (m_Joystick.GetRawButton(1) && m_Joystick.GetRawButton(15)) {
 		// Tower (center of mass)
 		centerOfRotation = kCenterOfMass;
 		rotation = rotate * kFastRotation;
 	} else {
 		// Robot center
 		centerOfRotation = kCenterOfRobot;
-		rotation = rotate * kMediumRotation;
+		rotation = rotate * kSlowRotation;
 	}
 
 	// Put values to SmartDashboard
@@ -60,18 +62,16 @@ void Robot::TeleopPeriodic() {
 	frc::SmartDashboard::PutNumber("Angle", static_cast<int>(gyro->GetYaw()));
 	
 	// Determine if robot is driving field oriented or robot oriented
-	bool fieldOriented = !m_Joystick.GetRawButton(2);
+	bool fieldOriented = !m_Joystick.GetRawButton(6);
 
 	// Control any attached mechanisms
-	m_somethingMachine.DoSomething(m_Joystick.GetRawButton(5));
+	m_cubeArm.SetAngle(m_Joystick.GetRawButton(20),m_Joystick.GetRawButton(22));
+	m_cubeArm.SetIntake(m_Joystick.GetRawButton(4),m_Joystick.GetRawButton(3),m_Joystick.GetRawButton(24),m_Joystick.GetRawButton(25),m_Joystick.GetRawButton(26));
 
 	// Drive the swerve modules
-	if(m_Joystick.GetRawButton(4)){
-		// Emergency braking (Button 4)
+	if(m_Joystick.GetRawButton(5)){
+		// Emergency braking (Button 5)
 		m_swerve.Drive(0_mps, 0_mps, 0_deg_per_s, fieldOriented, centerOfRotation);
-	}else if(m_Joystick.GetRawButton(3)){
-		// No rotation Drive
-		m_swerve.Drive(forward, strafe, 0_deg_per_s, fieldOriented, centerOfRotation);
 	}else{
 		// Normal Drive
 		m_swerve.Drive(forward, strafe, rotation, fieldOriented, centerOfRotation);

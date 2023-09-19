@@ -18,19 +18,18 @@ class Mechanism {
 			*
 			* @param Do The inputted Do
 		*/
-        void DoSomething(float up, float down);
+        void SetAngle(bool up, bool down);
+
+        void SetIntake(bool in, bool out, bool low, bool mid, bool high);
 
     private:
         // Declare all mechanism variables, motors, sensors, ect here
-        //declare x box controller
-        frc::XboxController m_xboxController{1};
-        //declare arm motors
-        WPI_TalonFX m_armAngle{12};
-        WPI_TalonFX m_roller{13};
-        //declare limit switches for arm
+
+        double motorSpeed = 0;
+
+        WPI_TalonFX m_AngleMotor{12};
+        WPI_TalonFX m_IntakeMotor{13};
+
         frc::DigitalInput m_LowerSwitch{0};
         frc::DigitalInput m_UpperSwitch{1};
-        
-
-        double Something;
 };

@@ -1,32 +1,33 @@
 #include "Mechanism.h"
 
 Mechanism::Mechanism(){
-	// Initial Mechanism Functions
-	if(!m_UpperSwitch.Get())
-	{
-		m_armAngle.Set(1);
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		m_armAngle.Set(0);
-	}
-	
+	m_AngleMotor.SetNeutralMode(Brake);
+	m_IntakeMotor.SetNeutralMode(Coast);
 }
 
-void Mechanism::DoSomething(float up, float down){
-	// Mechanism Action Function
-	if (m_xboxController.GetRightBumper())
-	{
-		m_roller.Set(-1);
+void Mechanism::SetAngle(bool up, bool down){
+	if(up && !down){
+		if(m_UpperSwitch.Get()){
+			m_AngleMotor.Set( 0.2 );
+		}
+	}else if(down && !up){
+		if(m_LowerSwitch.Get()){
+			m_AngleMotor.Set( -0.2 );
+		}
+	}else{
+		m_AngleMotor.Set( 0 );
 	}
-	else if(m_xboxController.GetLeftBumper())
-	{
-		m_roller.Set(1);
-	}
-	if (!m_LowerSwitch.Get())
-	{
-		m_armAngle.Set(down);
-	}
-	if(!m_UpperSwitch.Get())
-	{
-		m_armAngle.Set(up);
+}
+
+void Mechanism::SetIntake(bool in, bool out, bool low, bool mid, bool high){
+	
+	motorSpeed = ((low * 0.2) + (mid * 0.4) + (high * 0.9));
+	
+	if(out && !in){
+		m_IntakeMotor.Set(-motorSpeed);
+	}else if(in && !out){
+		m_IntakeMotor.Set(0.2);
+	}else{
+		m_IntakeMotor.Set(0);
 	}
 }

@@ -44,18 +44,18 @@ class Drivetrain {
 		// the wheels to form an "X" instead of diamond while turning.
 		// The x coordinate is the inverse of the correct X coordinate
 		// It's wrong but (++,-+,--,+-) it works, no touchy.
-		
-		SwerveModule m_rearLeft{0, 1, 2, 110};
-		frc::Translation2d m_rearLeftLocation{+(kRobotLength/2), +(kRobotWidth/2)};
-		
-		SwerveModule m_frontLeft{3, 4, 5, 148};
-		frc::Translation2d m_frontLeftLocation{-(kRobotLength/2), +(kRobotWidth/2)};
-		
-		SwerveModule m_frontRight{6, 7, 8, 250};
-		frc::Translation2d m_frontRightLocation{-(kRobotLength/2), -(kRobotWidth/2)};
 
-		SwerveModule m_rearRight{9, 10, 11, 105};
-		frc::Translation2d m_rearRightLocation{+(kRobotLength/2), -(kRobotWidth/2)};
+		SwerveModule m_rearLeft{6, 7, 8, 110};
+		frc::Translation2d m_rearLeftLocation{+kLengthLocation, +kWidthLocation};
+		
+		SwerveModule m_frontLeft{9, 10, 11, 148};
+		frc::Translation2d m_frontLeftLocation{-kLengthLocation, +kWidthLocation};
+		
+		SwerveModule m_frontRight{0, 1, 2, 250};
+		frc::Translation2d m_frontRightLocation{-kLengthLocation, -kWidthLocation};
+
+		SwerveModule m_rearRight{3, 4, 5, 105};
+		frc::Translation2d m_rearRightLocation{+kLengthLocation, -kWidthLocation};
 
 		frc::SwerveDriveKinematics<4> m_kinematics{m_rearLeftLocation, m_frontLeftLocation, m_frontRightLocation, m_rearRightLocation};
 
