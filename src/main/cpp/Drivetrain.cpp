@@ -10,7 +10,7 @@ void Drivetrain::Drive(units::meters_per_second_t forward, units::meters_per_sec
 												  : frc::ChassisSpeeds{forward, strafe, rotate},
 												  centerOfRotation);
 
-	m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
+	m_kinematics.DesaturateWheelSpeeds(&states, Swordtip::Velocity::Maximums::Max_Speed);
 
 	auto [rl, fl, fr, rr] = states;
 

@@ -13,10 +13,10 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 
 	m_driveMotor.ConfigFactoryDefault();
 	m_driveMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor, 0, 0);
-	m_driveMotor.Config_kP(0, drivekP);
-	m_driveMotor.Config_kI(0, drivekI);
-	m_driveMotor.Config_kD(0, drivekD);
-	m_driveMotor.Config_kF(0, drivekF);
+	m_driveMotor.Config_kP(0, Swordtip::PIDF::Drive::P);
+	m_driveMotor.Config_kI(0, Swordtip::PIDF::Drive::I);
+	m_driveMotor.Config_kD(0, Swordtip::PIDF::Drive::D);
+	m_driveMotor.Config_kF(0, Swordtip::PIDF::Drive::F);
 	m_driveMotor.ConfigNominalOutputForward(0);
 	m_driveMotor.ConfigNominalOutputReverse(0);
 	m_driveMotor.ConfigPeakOutputForward(1);
@@ -30,10 +30,10 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 	m_angleMotor.ConfigFactoryDefault();
 	m_angleMotor.ConfigRemoteFeedbackFilter(angleEncoderID, RemoteSensorSource(13), 0, 0);
 	m_angleMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::RemoteSensor0, 0, 0); // PIDLoop=0, timeoutMs=0
-	m_angleMotor.Config_kP(0, anglekP);
-	m_angleMotor.Config_kI(0, anglekI);
-	m_angleMotor.Config_kD(0, anglekD);
-	m_angleMotor.Config_kF(0, anglekF);
+	m_angleMotor.Config_kP(0, Swordtip::PIDF::Angle::P);
+	m_angleMotor.Config_kI(0, Swordtip::PIDF::Angle::I);
+	m_angleMotor.Config_kD(0, Swordtip::PIDF::Angle::D);
+	m_angleMotor.Config_kF(0, Swordtip::PIDF::Angle::F);
 	m_angleMotor.Config_IntegralZone(0, 20);
 	m_angleMotor.ConfigNominalOutputForward(0);
 	m_angleMotor.ConfigNominalOutputReverse(0);
@@ -53,7 +53,7 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
-	return {units::meter_t{(m_driveMotor.GetSelectedSensorPosition())*(((4*M_PI)/kDriveGearRatio)/2048)}, gyro->GetRotation2d()};
+	return {units::meter_t{(m_driveMotor.GetSelectedSensorPosition())*(((4*M_PI)/Swordtip::Drive_Gear_Ratio)/2048)}, gyro->GetRotation2d()};
 }
 
 frc::Rotation2d SwerveModule::getAngle() {
@@ -97,5 +97,5 @@ void SwerveModule::SetDesiredState(
 
 		// Set the motor outputs.
 		m_driveMotor.Set((double) optimized_speed);
-		m_angleMotor.Set(TalonFXControlMode::Position, optimized_angle.Degrees().value()*(conversionFactor));
+		m_angleMotor.Set(TalonFXControlMode::Position, optimized_angle.Degrees().value()*(Swordtip::Conversion_Factor));
 }

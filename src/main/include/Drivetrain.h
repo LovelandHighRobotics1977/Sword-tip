@@ -46,16 +46,16 @@ class Drivetrain {
 		// It's wrong but (++,-+,--,+-) it works, no touchy.
 
 		SwerveModule m_rearLeft{6, 7, 8, 110};
-		frc::Translation2d m_rearLeftLocation{+kLengthLocation, +kWidthLocation};
+		frc::Translation2d m_rearLeftLocation{+Swordtip::Frame::Length_Location, +Swordtip::Frame::Width_Location};
 		
 		SwerveModule m_frontLeft{9, 10, 11, 148};
-		frc::Translation2d m_frontLeftLocation{-kLengthLocation, +kWidthLocation};
+		frc::Translation2d m_frontLeftLocation{-Swordtip::Frame::Length_Location, +Swordtip::Frame::Width_Location};
 		
 		SwerveModule m_frontRight{0, 1, 2, 250};
-		frc::Translation2d m_frontRightLocation{-kLengthLocation, -kWidthLocation};
+		frc::Translation2d m_frontRightLocation{-Swordtip::Frame::Length_Location, -Swordtip::Frame::Width_Location};
 
 		SwerveModule m_rearRight{3, 4, 5, 105};
-		frc::Translation2d m_rearRightLocation{+kLengthLocation, -kWidthLocation};
+		frc::Translation2d m_rearRightLocation{+Swordtip::Frame::Length_Location, -Swordtip::Frame::Width_Location};
 
 		frc::SwerveDriveKinematics<4> m_kinematics{m_rearLeftLocation, m_frontLeftLocation, m_frontRightLocation, m_rearRightLocation};
 

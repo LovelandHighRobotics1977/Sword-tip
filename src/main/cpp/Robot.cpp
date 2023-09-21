@@ -25,6 +25,7 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {
 	gyro->Reset();
 }
+
 void Robot::TeleopPeriodic() {
 	// Reset Gyro
 	if(m_Joystick.GetRawButton(2)){
@@ -38,23 +39,23 @@ void Robot::TeleopPeriodic() {
 	double throttle = ((1 - ((m_Joystick.GetZ() + 1) / 2)) * frc::SmartDashboard::GetNumber("Max Speed", 1));
 
 	// Calculate swerve module inputs
-	const auto forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(j_forward, 0.2)) * throttle) * kMaxSpeed;
-	const auto strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(j_strafe, 0.2)) * throttle) * kMaxSpeed;
-	const auto rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(j_rotate, 0.3)) * sqrt(throttle));
+	auto forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(j_forward, 0.2)) * throttle) * Swordtip::Velocity::Maximums::Max_Speed;
+	auto strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(j_strafe, 0.2)) * throttle) * Swordtip::Velocity::Maximums::Max_Speed;
+	double rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(j_rotate, 0.3)) * sqrt(throttle));
 
-	// Determine center of rotation based on button input
+		// Determine center of rotation based on button input
 	if (m_Joystick.GetRawButton(1) && !m_Joystick.GetRawButton(15)) {
 		// Tower (center of mass)
-		centerOfRotation = kCenterOfMass;
-		rotation = rotate * kMediumRotation;
+		centerOfRotation = Swordtip::Frame::Center;
+		rotation = rotate * Swordtip::Velocity::Rotation::Medium;
 	}else if (m_Joystick.GetRawButton(1) && m_Joystick.GetRawButton(15)) {
 		// Tower (center of mass)
-		centerOfRotation = kCenterOfMass;
-		rotation = rotate * kFastRotation;
+		centerOfRotation = Swordtip::Frame::Center;
+		rotation = rotate * Swordtip::Velocity::Rotation::Fast;
 	} else {
 		// Robot center
-		centerOfRotation = kCenterOfRobot;
-		rotation = rotate * kSlowRotation;
+		centerOfRotation = Swordtip::Frame::Center;
+		rotation = rotate * Swordtip::Velocity::Rotation::Slow;
 	}
 
 	// Put values to SmartDashboard

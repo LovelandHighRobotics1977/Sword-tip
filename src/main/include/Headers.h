@@ -46,24 +46,59 @@
 //user defined
 #include "Gyro.h"
 
-//global constants
-static const double conversionFactor = 4096.0/ 360.0;
-static constexpr double kDriveGearRatio = 6.75; //Gear ratio is L2 6.75:1
+namespace Swordtip{
+	//robot misc specifications
+	static constexpr double Drive_Gear_Ratio = 6.75; 											//	Gear ratio is L2 6.75:1
+	static constexpr double Conversion_Factor = 4096.0/ 360.0;
 
-//robot frame constants
-static constexpr units::meter_t kRobotLength = 26_in;  //  |Front left| frame to |rear left| frame
-static constexpr units::meter_t kRobotWidth = 26_in;  //  |Front left| frame to |front right| frame
-static constexpr units::meter_t kLengthOffset = 2.625_in;  //  distance from edge of frame to wheel
-static constexpr units::meter_t kWidthOffset = 2.625_in;  //  distance from edge of frame to wheel
-static constexpr units::meter_t kLengthLocation = ((kRobotLength/2)-kLengthOffset);
-static constexpr units::meter_t kWidthLocation = ((kRobotWidth/2)-kWidthOffset);
+	namespace Frame {
+		static constexpr units::meter_t Length = 26_in;  										//  |Front left| frame to |rear left| frame
+		static constexpr units::meter_t Width = 26_in;  										//  |Front left| frame to |front right| frame
 
-//robot maximum constants
-static constexpr frc::Translation2d kCenterOfRobot = {0_in,0_in};           //  position of the center of the robot
-static constexpr frc::Translation2d kCenterOfMass = {0_in,0_in};          //  position of the center of mass (in this case the robot tower)
-static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;             //  1 "meter" per second
-static constexpr units::degrees_per_second_t kSlowRotation = 60_deg_per_s;   //  60 "degrees" per second
-static constexpr units::degrees_per_second_t kMediumRotation = 120_deg_per_s; //  120 "degrees" per second
-static constexpr units::degrees_per_second_t kFastRotation = 180_deg_per_s;  //  180 "degrees" per second
+		static constexpr units::meter_t Length_Offset = 2.625_in;  								//  distance from edge of frame to wheel
+		static constexpr units::meter_t Width_Offset = 2.625_in;  								//  distance from edge of frame to wheel
+
+		static constexpr units::meter_t Length_Location = ((Length/2)-Length_Offset);			//	distance from center to wheel |Left / Right|
+		static constexpr units::meter_t Width_Location = ((Width/2)-Width_Offset);				//	distance from center to wheel |Front / Back|
+
+		static constexpr frc::Translation2d Center = {0_in,0_in};   							//  position of the center of the robot
+		static constexpr frc::Translation2d Tower = {-10.5_in,0_in};							//  position of the robot tower
+	}
+	
+
+
+
+	namespace Velocity {
+		namespace Maximums {
+			static constexpr units::feet_per_second_t Max_Speed = 3_fps;                 	//  max horizontal velocity 16.3 feet per second
+			static constexpr units::degrees_per_second_t Max_Rotation = 360_deg_per_s;   	//  max rotational velocity ~763 degrees per second
+		}
+		
+		namespace Rotation {
+			static constexpr units::degrees_per_second_t Slow =  120_deg_per_s;      		//  250 degrees per second
+			static constexpr units::degrees_per_second_t Medium = 180_deg_per_s;    		//  380 degrees per second
+			static constexpr units::degrees_per_second_t Fast = 360_deg_per_s;  			//  760 degrees per second
+		}
+	}
+
+
+
+
+	namespace PIDF {
+		namespace Drive {
+				static constexpr double P = 0.001;
+				static constexpr double I = 0;
+				static constexpr double D = 0.005;
+				static constexpr double F = 1;
+		}
+
+		namespace Angle {
+				static constexpr double P = 1.7;
+				static constexpr double I = 0.0016;
+				static constexpr double D = 160;
+				static constexpr double F = 0;
+		}
+	}
+};
 
 #endif /* !HEADERS_H */
