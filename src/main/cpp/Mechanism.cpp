@@ -32,22 +32,32 @@ void Mechanism::SetAngle(bool up, bool down){
 	}
 }
 
-void Mechanism::SetIntake(bool in, bool out, bool low, bool mid, bool high){
-	
-	motorSpeed = ((low * 0.2) + (mid * 0.4) + (high * 0.9));
-	if(low){
+void Mechanism::SetIntake(bool in, bool out){
+	switch(speed)
+	{
+		case 1:
+		motorSpeed = 0.2;
+		break;
+		case 2:
+		motorSpeed = 0.4;
+		break;
+		case 3:
+		motorSpeed = 0.9;
+		break;
+	}
+	if(speed == 1){
 		frc::SmartDashboard::PutString("low","██");
 	}else{
 		frc::SmartDashboard::PutString("low","  ");
 	}
 
-	if(mid){
+	if(speed == 2){
 		frc::SmartDashboard::PutString("mid","██");
 	}else{
 		frc::SmartDashboard::PutString("mid","  ");
 	}
 
-	if(high){
+	if(speed == 3){
 		frc::SmartDashboard::PutString("hgh","██");
 	}else{
 		frc::SmartDashboard::PutString("hgh","  ");
@@ -59,5 +69,20 @@ void Mechanism::SetIntake(bool in, bool out, bool low, bool mid, bool high){
 		m_IntakeMotor.Set(0.2);
 	}else{
 		m_IntakeMotor.Set(0);
+	}
+}
+int Mechanism::SetSpeed(bool x, bool y, bool b)
+{
+	if (x)
+	{
+		speed = 1;
+	}
+	else if (y)
+	{
+		speed = 2;
+	}
+	else if (b)
+	{
+		speed = 3;
 	}
 }

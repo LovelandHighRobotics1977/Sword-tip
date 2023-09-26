@@ -20,7 +20,11 @@ class Mechanism {
 		*/
         void SetAngle(bool up, bool down);
 
-        void SetIntake(bool in, bool out, bool low, bool mid, bool high);
+        void SetIntake(bool in, bool out);
+
+        int SetSpeed(bool x, bool y, bool b);
+
+        int speed;
 
     private:
         // Declare all mechanism variables, motors, sensors, ect here

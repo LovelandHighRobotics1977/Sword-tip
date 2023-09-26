@@ -78,8 +78,26 @@ void Robot::TeleopPeriodic() {
 	bool fieldOriented = !m_Joystick.GetRawButton(6);
 
 	// Control any attached mechanisms
-	m_cubeArm.SetAngle(m_Joystick.GetRawButton(20),m_Joystick.GetRawButton(22));
-	m_cubeArm.SetIntake(m_Joystick.GetRawButton(4),m_Joystick.GetRawButton(3),m_Joystick.GetRawButton(24),m_Joystick.GetRawButton(25),m_Joystick.GetRawButton(26));
+	if(m_Xbox.GetLeftTriggerAxis() > 0)
+	{
+		up = true;
+	}
+	else
+	{
+		up = false;
+	}
+	if (m_Xbox.GetRightTriggerAxis() > 0)
+	{
+		down = true;
+	}
+	else 
+	{
+		down = false;
+	}
+
+	m_cubeArm.SetAngle(up,down);
+	m_cubeArm.SetIntake(m_Xbox.GetLeftBumper(), m_Xbox.GetRightBumper());
+	m_cubeArm.SetSpeed(m_Xbox.GetXButton(), m_Xbox.GetYButton(), m_Xbox.GetBButton());
 
 	// Drive the swerve modules
 	if(m_Joystick.GetRawButton(5)){
