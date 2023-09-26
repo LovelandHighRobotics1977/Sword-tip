@@ -106,6 +106,10 @@ class Robot : public frc::TimedRobot {
 	private:
 		frc::Joystick m_Joystick{0};
 
+		cs::UsbCamera r_driveCam;
+		cs::UsbCamera r_armCam;
+		cs::VideoSink r_camServer;
+
 		//Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1
 		frc::SlewRateLimiter<units::dimensionless::scalar> m_forwardLimiter{3 / 1_s};
 		frc::SlewRateLimiter<units::dimensionless::scalar> m_strafeLimiter{3 / 1_s};

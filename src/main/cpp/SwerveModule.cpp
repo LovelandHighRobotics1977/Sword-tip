@@ -53,7 +53,7 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
-	return {units::meter_t{(m_driveMotor.GetSelectedSensorPosition())*(((4*M_PI)/Swordtip::Drive_Gear_Ratio)/2048)}, gyro->GetRotation2d()};
+	return {units::meter_t{(m_driveMotor.GetSelectedSensorPosition())*(((4*3)/Swordtip::Drive_Gear_Ratio)/2048)}, gyro->GetRotation2d()};
 }
 
 frc::Rotation2d SwerveModule::getAngle() {

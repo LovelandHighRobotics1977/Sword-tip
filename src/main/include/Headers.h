@@ -41,13 +41,14 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 //misc
-//#include <cameraserver/CameraServer.h>
+#include <cameraserver/CameraServer.h>
 
 //user defined
 #include "Gyro.h"
 
 namespace Swordtip{
 	//robot misc specifications
+	static constexpr auto Robot_Name = "   1977 : Swordtip";
 	static constexpr double Drive_Gear_Ratio = 6.75; 											//	Gear ratio is L2 6.75:1
 	static constexpr double Conversion_Factor = 4096.0/ 360.0;
 

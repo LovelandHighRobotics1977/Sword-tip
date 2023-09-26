@@ -5,25 +5,37 @@
 #include "Robot.h"
 
 void Robot::RobotInit() {
-	frc::SmartDashboard::PutNumber("vD:",0);
-	frc::SmartDashboard::PutNumber("vX:",0);
-	frc::SmartDashboard::PutNumber("vY:",0);
-	frc::SmartDashboard::PutNumber("Max Speed",1);
+	frc::SmartDashboard::PutString("Match State","   Disabled");
+	frc::SmartDashboard::PutString("Robot Name",Swordtip::Robot_Name);
+	frc::SmartDashboard::PutNumber("X_POS", 0);
+	frc::SmartDashboard::PutNumber("Y_POS", 0);
+
+	frc::SmartDashboard::PutNumber("X_VEL", 0);
+	frc::SmartDashboard::PutNumber("Y_VEL", 0);
+
+	m_swerve.Drive(0_fps,0_fps,0_deg_per_s,0,Swordtip::Frame::Center);
+	m_cubeArm.SetIntake(0,0,1,1,1);
+	m_cubeArm.SetAngle(0,0);
+
+	/*
+	r_driveCam = frc::CameraServer::StartAutomaticCapture(0);
+	r_armCam = frc::CameraServer::StartAutomaticCapture(1);
+
+	r_driveCam.SetPixelFormat(cs::VideoMode::PixelFormat::kYUYV);
+	r_armCam.SetPixelFormat(cs::VideoMode::PixelFormat::kYUYV);
+	*/
 }
 void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {
+	frc::SmartDashboard::PutString("Match State","   Autonomous");
 }
 void Robot::AutonomousPeriodic() {
-	auto angle = units::degrees_per_second_t{frc::SmartDashboard::GetNumber("vD:",0)};
-	auto vx = units::meters_per_second_t{-frc::SmartDashboard::GetNumber("vX:",0)};
-	auto vy = units::meters_per_second_t{frc::SmartDashboard::GetNumber("vY:",0)};
-	
-	m_swerve.Drive(-vx,-vy,angle,1,{0_m,0_m});
 }
 
 void Robot::TeleopInit() {
 	gyro->Reset();
+	frc::SmartDashboard::PutString("Match State","   TeleOperated");
 }
 
 void Robot::TeleopPeriodic() {
@@ -36,7 +48,7 @@ void Robot::TeleopPeriodic() {
 	double j_forward = m_Joystick.GetY();
 	double j_strafe = -m_Joystick.GetX();
 	double j_rotate = m_Joystick.GetRawAxis(5);
-	double throttle = ((1 - ((m_Joystick.GetZ() + 1) / 2)) * frc::SmartDashboard::GetNumber("Max Speed", 1));
+	double throttle = ((1 - ((m_Joystick.GetZ() + 1) / 2)));
 
 	// Calculate swerve module inputs
 	auto forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(j_forward, 0.2)) * throttle) * Swordtip::Velocity::Maximums::Max_Speed;
@@ -77,12 +89,24 @@ void Robot::TeleopPeriodic() {
 		// Normal Drive
 		m_swerve.Drive(forward, strafe, rotation, fieldOriented, centerOfRotation);
 	}
+
+	auto robot_position = m_swerve.UpdateOdometry();
+
+	frc::SmartDashboard::PutNumber("X_POS", robot_position.X().value());
+	frc::SmartDashboard::PutNumber("Y_POS", robot_position.Y().value());
+
+	frc::SmartDashboard::PutNumber("X_VEL", gyro->GetVelocityX());
+	frc::SmartDashboard::PutNumber("Y_VEL", gyro->GetVelocityY());
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledInit() {
+	frc::SmartDashboard::PutString("Match State","   Disabled");
+}
 void Robot::DisabledPeriodic() {}
 
-void Robot::TestInit() {}
+void Robot::TestInit() {
+	frc::SmartDashboard::PutString("Match State","   Test");
+}
 void Robot::TestPeriodic() {}
 
 #ifndef RUNNING_FRc_TESTS
