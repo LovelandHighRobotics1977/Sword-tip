@@ -35,6 +35,8 @@ class SwerveModule {
 
 		void SetDesiredState(const frc::SwerveModuleState& state);
 
+		void SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode mode);
+
 	private:
 		Gyro* gyro = Gyro::GetInstance();
 

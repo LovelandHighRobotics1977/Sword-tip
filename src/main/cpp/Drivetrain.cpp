@@ -25,6 +25,37 @@ void Drivetrain::Drive(units::meters_per_second_t forward, units::meters_per_sec
 	m_rearRight.SetDesiredState(rr);
 }
 
+void Drivetrain::AutoBalance(){
+	current_angle_raw = gyro->GetRoll();
+
+	current_angle = abs(current_angle_raw);
+
+	leaning_left = current_angle_raw > 0;
+	leaning_right = current_angle_raw < 0;
+
+	angle_threshold = (((current_angle <= threshold_angles[0])+((current_angle <= threshold_angles[1]))+((current_angle <= threshold_angles[2]))+((current_angle <= threshold_angles[3]))+((current_angle <= threshold_angles[4]))));
+
+	if(leaning_left){
+		Drive(0_mps,1_mps * speed_multiplier[angle_threshold - 1],0_deg_per_s,0,Swordtip::Frame::Center);
+	}else if(leaning_right){
+		Drive(0_mps,-1_mps * speed_multiplier[angle_threshold - 1],0_deg_per_s,0,Swordtip::Frame::Center);
+	}
+}
+
+void Drivetrain::HaltRobot(){
+	m_rearLeft.SetDesiredState({0_mps,0_deg});
+	m_frontLeft.SetDesiredState({0_mps,0_deg});
+	m_frontRight.SetDesiredState({0_mps,0_deg});
+	m_rearRight.SetDesiredState({0_mps,0_deg});
+}
+
+void Drivetrain::SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode mode){
+	m_rearLeft.SetNeutralMode(mode);
+	m_frontLeft.SetNeutralMode(mode);
+	m_frontRight.SetNeutralMode(mode);
+	m_rearRight.SetNeutralMode(mode);
+}
+
 frc::Pose2d Drivetrain::UpdateOdometry() {return m_odometry.Update(gyro->GetRotation2d(), 
 																{
 																	m_rearLeft.GetPosition(), m_frontLeft.GetPosition(), 

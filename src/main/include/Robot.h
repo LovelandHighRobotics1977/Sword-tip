@@ -103,10 +103,9 @@ class Robot : public frc::TimedRobot {
 		void TestInit() override;
 		void TestPeriodic() override;
 
-		bool up = true;
-		bool down = false;
-
 	private:
+		int auto_stage = 0;
+
 		frc::Joystick m_Joystick{0};
 		frc::XboxController m_Xbox{1};
 

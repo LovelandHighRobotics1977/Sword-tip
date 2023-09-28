@@ -71,14 +71,14 @@ namespace Swordtip{
 
 	namespace Velocity {
 		namespace Maximums {
-			static constexpr units::feet_per_second_t Max_Speed = 3_fps;                 	//  max horizontal velocity 16.3 feet per second
-			static constexpr units::degrees_per_second_t Max_Rotation = 360_deg_per_s;   	//  max rotational velocity ~763 degrees per second
+			static constexpr units::feet_per_second_t Max_Speed = 11_fps;                		//  max horizontal velocity 16.3 feet per second
+			static constexpr units::degrees_per_second_t Max_Rotation = 420_deg_per_s;   		//  max rotational velocity ~763 degrees per second
 		}
 		
 		namespace Rotation {
-			static constexpr units::degrees_per_second_t Slow =  120_deg_per_s;      		//  250 degrees per second
-			static constexpr units::degrees_per_second_t Medium = 180_deg_per_s;    		//  380 degrees per second
-			static constexpr units::degrees_per_second_t Fast = 360_deg_per_s;  			//  760 degrees per second
+			static constexpr units::degrees_per_second_t Slow =  Maximums::Max_Rotation / 3;    //  250 degrees per second
+			static constexpr units::degrees_per_second_t Medium = Maximums::Max_Rotation / 2;   //  380 degrees per second
+			static constexpr units::degrees_per_second_t Fast = Maximums::Max_Rotation;  		//  760 degrees per second
 		}
 	}
 

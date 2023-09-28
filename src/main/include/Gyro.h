@@ -69,6 +69,10 @@ class Gyro {
 	double GetVelocityY(){
 		return ahrs.GetVelocityY();
 	}
+
+	double GetRoll(){
+		return ahrs.GetRoll();
+	}
 };
 
 #endif /* !GYROSCOPE_H */

@@ -14,17 +14,39 @@ class Mechanism {
         Mechanism();
 
         /**
-			* Takes A Do and does Something with it
+			* Takes two boolean values and sets the angle of the mechanism arm
 			*
-			* @param Do The inputted Do
+			* @param up Angle the mechanism up if true
+            * @param down Angle the mechanism down if true
 		*/
         void SetAngle(bool up, bool down);
 
+        /**
+			* Takes two boolean values and controls the intake
+			*
+			* @param in Set the mechanism to intake a game piece
+            * @param out Set the mechanism to fire a game piece
+		*/
         void SetIntake(bool in, bool out);
 
-        int SetSpeed(bool x, bool y, bool b);
+        /**
+			* Takes three boolean values and sets firing speed
+			*
+			* @param slow Set the firing speed to slow
+            * @param medium Set the firing speed to medium
+            * @param fast Set the firing speed to maximum
+            * 
+            * 
+            * @note
+            * Slow -> Best for low nodes
+            * @note
+            * Medium -> Best for middle nodes
+            * @note
+            * Fast -> Best for high nodes (more challenging to hit)
+		*/
+        void SetSpeed(bool slow, bool medium, bool fast);
 
-        int speed;
+        int speed = 0;
 
     private:
         // Declare all mechanism variables, motors, sensors, ect here

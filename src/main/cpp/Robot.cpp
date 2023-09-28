@@ -14,8 +14,11 @@ void Robot::RobotInit() {
 	frc::SmartDashboard::PutNumber("Y_VEL", 0);
 
 	m_swerve.Drive(0_fps,0_fps,0_deg_per_s,0,Swordtip::Frame::Center);
-	m_cubeArm.SetIntake(0,0,1,1,1);
+	m_cubeArm.SetIntake(0,0);
 	m_cubeArm.SetAngle(0,0);
+	m_cubeArm.SetSpeed(0,0,0);
+
+	timer.Start();
 
 	/*
 	r_driveCam = frc::CameraServer::StartAutomaticCapture(0);
@@ -29,12 +32,60 @@ void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {
 	frc::SmartDashboard::PutString("Match State","   Autonomous");
+	m_swerve.Drive(0_mps,0_mps,0_deg_per_s,0,Swordtip::Frame::Center);
+	m_swerve.SetNeutralMode(Brake);
+	timer.Start();
+	timer.Restart();
+	gyro->Reset();
 }
 void Robot::AutonomousPeriodic() {
+
+	int currentTime = std::ceil(timer.Get().value());
+
+	// Set autonomous stage based on time elapsed
+	switch (currentTime){
+		case 1: auto_stage = 1; break;
+		case 2: auto_stage = 2; break;
+		case 3: auto_stage = 3; break;
+		case 4: auto_stage = 4; break;
+		default: auto_stage = 4; break;
+	}
+
+	// Autonomous stages
+	switch (auto_stage){
+		case 1: 
+			// Fire a cube into the mid node
+			m_cubeArm.SetSpeed(0,1,0);
+			m_cubeArm.SetIntake(0,1);
+			break;
+
+		case 2: 
+			// Stop the intake and drive quickly away going slightly to the right
+			m_cubeArm.SetIntake(0,0);
+			m_swerve.Drive(Swordtip::Velocity::Maximums::Max_Speed,0.2_fps,0_deg_per_s,1,Swordtip::Frame::Center);
+			break;
+
+		case 3: 
+			// Drive to the left to approach the charge station from behind
+			m_swerve.Drive(0_mps,0_mps,90_deg_per_s,1,Swordtip::Frame::Center);
+			break;
+
+		case 4:
+			// Auto Balance the robot
+			m_swerve.AutoBalance();
+			break;
+
+		default:
+			// Freeze the robot if not in any stage
+			m_swerve.HaltRobot();
+			break;
+
+	}
 }
 
 void Robot::TeleopInit() {
 	gyro->Reset();
+	m_swerve.SetNeutralMode(Brake);
 	frc::SmartDashboard::PutString("Match State","   TeleOperated");
 }
 
@@ -53,21 +104,21 @@ void Robot::TeleopPeriodic() {
 	// Calculate swerve module inputs
 	auto forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(j_forward, 0.2)) * throttle) * Swordtip::Velocity::Maximums::Max_Speed;
 	auto strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(j_strafe, 0.2)) * throttle) * Swordtip::Velocity::Maximums::Max_Speed;
-	double rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(j_rotate, 0.3)) * sqrt(throttle));
+	auto rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(j_rotate, 0.3)) * sqrt(throttle)) * Swordtip::Velocity::Maximums::Max_Rotation;
 
-		// Determine center of rotation based on button input
+	// Determine center of rotation based on button input
 	if (m_Joystick.GetRawButton(1) && !m_Joystick.GetRawButton(15)) {
 		// Tower (center of mass)
 		centerOfRotation = Swordtip::Frame::Center;
-		rotation = rotate * Swordtip::Velocity::Rotation::Medium;
+		rotation = rotate / 2;
 	}else if (m_Joystick.GetRawButton(1) && m_Joystick.GetRawButton(15)) {
 		// Tower (center of mass)
 		centerOfRotation = Swordtip::Frame::Center;
-		rotation = rotate * Swordtip::Velocity::Rotation::Fast;
+		rotation = rotate / 1;
 	} else {
 		// Robot center
 		centerOfRotation = Swordtip::Frame::Center;
-		rotation = rotate * Swordtip::Velocity::Rotation::Slow;
+		rotation = rotate / 3;
 	}
 
 	// Put values to SmartDashboard
@@ -78,31 +129,14 @@ void Robot::TeleopPeriodic() {
 	bool fieldOriented = !m_Joystick.GetRawButton(6);
 
 	// Control any attached mechanisms
-	if(m_Xbox.GetLeftTriggerAxis() > 0)
-	{
-		up = true;
-	}
-	else
-	{
-		up = false;
-	}
-	if (m_Xbox.GetRightTriggerAxis() > 0)
-	{
-		down = true;
-	}
-	else 
-	{
-		down = false;
-	}
-
-	m_cubeArm.SetAngle(up,down);
+	m_cubeArm.SetAngle(m_Xbox.GetLeftTriggerAxis() > 0,m_Xbox.GetRightTriggerAxis() > 0);
 	m_cubeArm.SetIntake(m_Xbox.GetLeftBumper(), m_Xbox.GetRightBumper());
 	m_cubeArm.SetSpeed(m_Xbox.GetXButton(), m_Xbox.GetYButton(), m_Xbox.GetBButton());
-
+	
 	// Drive the swerve modules
 	if(m_Joystick.GetRawButton(5)){
 		// Emergency braking (Button 5)
-		m_swerve.Drive(0_mps, 0_mps, 0_deg_per_s, fieldOriented, centerOfRotation);
+		m_swerve.HaltRobot();
 	}else{
 		// Normal Drive
 		m_swerve.Drive(forward, strafe, rotation, fieldOriented, centerOfRotation);
@@ -119,6 +153,7 @@ void Robot::TeleopPeriodic() {
 
 void Robot::DisabledInit() {
 	frc::SmartDashboard::PutString("Match State","   Disabled");
+	m_swerve.HaltRobot();
 }
 void Robot::DisabledPeriodic() {}
 

@@ -2,7 +2,7 @@
 
 Mechanism::Mechanism(){
 	m_AngleMotor.SetNeutralMode(Brake);
-	m_IntakeMotor.SetNeutralMode(Coast);
+	m_IntakeMotor.SetNeutralMode(Brake);
 }
 
 void Mechanism::SetAngle(bool up, bool down){
@@ -71,18 +71,14 @@ void Mechanism::SetIntake(bool in, bool out){
 		m_IntakeMotor.Set(0);
 	}
 }
-int Mechanism::SetSpeed(bool x, bool y, bool b)
-{
-	if (x)
-	{
+void Mechanism::SetSpeed(bool slow, bool medium, bool fast){
+	if(slow){
 		speed = 1;
 	}
-	else if (y)
-	{
+	else if(medium){
 		speed = 2;
 	}
-	else if (b)
-	{
+	else if(fast){
 		speed = 3;
 	}
 }

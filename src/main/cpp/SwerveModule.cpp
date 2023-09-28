@@ -88,6 +88,7 @@ void SwerveModule::SetDesiredState(
 		case 8:
 			frc::SmartDashboard::PutNumber("Front Right angle", optimized_angle.Degrees().value());
 			frc::SmartDashboard::PutNumber("Front Right speed", optimized_speed.value());
+			
 			break;
 		case 11:
 			frc::SmartDashboard::PutNumber("Rear Right angle", optimized_angle.Degrees().value());
@@ -98,4 +99,9 @@ void SwerveModule::SetDesiredState(
 		// Set the motor outputs.
 		m_driveMotor.Set((double) optimized_speed);
 		m_angleMotor.Set(TalonFXControlMode::Position, optimized_angle.Degrees().value()*(Swordtip::Conversion_Factor));
+}
+
+void SwerveModule::SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode mode){
+	m_driveMotor.SetNeutralMode(mode);
+	m_angleMotor.SetNeutralMode(mode);
 }
