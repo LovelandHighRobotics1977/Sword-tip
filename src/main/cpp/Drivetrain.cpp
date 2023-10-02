@@ -14,11 +14,6 @@ void Drivetrain::Drive(units::meters_per_second_t forward, units::meters_per_sec
 
 	auto [rl, fl, fr, rr] = states;
 
-	rl = (frc::SwerveModuleState{rl.speed, frc::Rotation2d{units::angle::degree_t{fmod((rl.angle.Degrees().value()+360),360)}}});
-	fl = (frc::SwerveModuleState{fl.speed, frc::Rotation2d{units::angle::degree_t{fmod((fl.angle.Degrees().value()+360),360)}}});
-	fr = (frc::SwerveModuleState{fr.speed, frc::Rotation2d{units::angle::degree_t{fmod((fr.angle.Degrees().value()+360),360)}}});
-	rr = (frc::SwerveModuleState{rr.speed, frc::Rotation2d{units::angle::degree_t{fmod((rr.angle.Degrees().value()+360),360)}}});
-
 	m_rearLeft.SetDesiredState(rl);
 	m_frontLeft.SetDesiredState(fl);
 	m_frontRight.SetDesiredState(fr);
@@ -26,20 +21,23 @@ void Drivetrain::Drive(units::meters_per_second_t forward, units::meters_per_sec
 }
 
 void Drivetrain::AutoBalance(){
-	current_angle_raw = gyro->GetRoll();
+	angle_threshold = 0;
 
-	current_angle = abs(current_angle_raw);
+	current_angle = gyro->GetRoll();
 
-	leaning_left = current_angle_raw > 0;
-	leaning_right = current_angle_raw < 0;
-
-	angle_threshold = (((current_angle <= threshold_angles[0])+((current_angle <= threshold_angles[1]))+((current_angle <= threshold_angles[2]))+((current_angle <= threshold_angles[3]))+((current_angle <= threshold_angles[4]))));
-
-	if(leaning_left){
-		Drive(0_mps,1_mps * speed_multiplier[angle_threshold - 1],0_deg_per_s,0,Swordtip::Frame::Center);
-	}else if(leaning_right){
-		Drive(0_mps,-1_mps * speed_multiplier[angle_threshold - 1],0_deg_per_s,0,Swordtip::Frame::Center);
+	for (int i = 0; i < 5; ++i) {
+		if (abs(current_angle) <= threshold_angles[i]) {
+			angle_threshold += 1;
+		}
 	}
+
+	if(current_angle > 0){
+		chosen_speed = speed_multiplier[angle_threshold - 1];
+	}else if(current_angle < 0){
+		chosen_speed = -speed_multiplier[angle_threshold - 1];
+	}
+
+	Drive(0_fps,Swordtip::Velocity::Maximums::Max_Speed * chosen_speed,0_deg_per_s,0,Swordtip::Frame::RotationPoints::Center);
 }
 
 void Drivetrain::HaltRobot(){

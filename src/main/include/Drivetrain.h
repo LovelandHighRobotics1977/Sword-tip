@@ -45,18 +45,14 @@ class Drivetrain {
 	private:
 		Gyro* gyro = Gyro::GetInstance();
 
-		double current_angle_raw;
-
 		double current_angle;
 
-		bool leaning_left;
-		bool leaning_right;
-
-		double threshold_angles[5] = { 30,   20,  10,   5,   2};
-
-		double speed_multiplier[5] = {0.30,0.15,0.10,0.08,0.00};
+		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
+		double speed_multiplier[5] = {0.30, 0.15, 0.10, 0.08, 0.00};  // Associated motor speeds
 
 		int angle_threshold;
+
+		double chosen_speed;
 
 		//gear ratio is L2 6.75:1
 
@@ -66,16 +62,16 @@ class Drivetrain {
 		// It's wrong but (++,-+,--,+-) it works, no touchy.
 		
 		SwerveModule m_frontRight{0, 1, 2, -112.588};
-		frc::Translation2d m_frontRightLocation{-Swordtip::Frame::Length_Location, -Swordtip::Frame::Width_Location};
+		frc::Translation2d m_frontRightLocation{-Swordtip::Frame::Measurments::Length_Location, -Swordtip::Frame::Measurments::Width_Location};
 
 		SwerveModule m_rearRight{3, 4, 5, 101.777};
-		frc::Translation2d m_rearRightLocation{+Swordtip::Frame::Length_Location, -Swordtip::Frame::Width_Location};
+		frc::Translation2d m_rearRightLocation{+Swordtip::Frame::Measurments::Length_Location, -Swordtip::Frame::Measurments::Width_Location};
 
 		SwerveModule m_rearLeft{6, 7, 8, 111.0059};
-		frc::Translation2d m_rearLeftLocation{+Swordtip::Frame::Length_Location, +Swordtip::Frame::Width_Location};
+		frc::Translation2d m_rearLeftLocation{+Swordtip::Frame::Measurments::Length_Location, +Swordtip::Frame::Measurments::Width_Location};
 		
 		SwerveModule m_frontLeft{9, 10, 11, 149.6777};
-		frc::Translation2d m_frontLeftLocation{-Swordtip::Frame::Length_Location, +Swordtip::Frame::Width_Location};
+		frc::Translation2d m_frontLeftLocation{-Swordtip::Frame::Measurments::Length_Location, +Swordtip::Frame::Measurments::Width_Location};
 
 		frc::SwerveDriveKinematics<4> m_kinematics{m_rearLeftLocation, m_frontLeftLocation, m_frontRightLocation, m_rearRightLocation};
 

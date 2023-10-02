@@ -104,8 +104,6 @@ class Robot : public frc::TimedRobot {
 		void TestPeriodic() override;
 
 	private:
-		int auto_stage = 0;
-
 		frc::Joystick m_Joystick{0};
 		frc::XboxController m_Xbox{1};
 
@@ -120,12 +118,39 @@ class Robot : public frc::TimedRobot {
 
 		frc::Timer timer;
 
+		frc::Pose2d robot_position;
+
 		Gyro* gyro = Gyro::GetInstance();
 
 		Drivetrain m_swerve{};
 
 		Mechanism m_cubeArm{};
 
-		frc::Translation2d centerOfRotation = {0_m,0_m};
-		units::degrees_per_second_t rotation = 0_deg_per_s;
+
+// Auto Variables
+
+		int auto_stage = 0;
+
+		int current_time;
+
+
+// Teleop variables
+
+		frc::Translation2d center_of_rotation = {0_m,0_m};
+
+		units::degrees_per_second_t rotation_speed = 0_deg_per_s;
+
+		double throttle;
+
+		bool field_oriented;
+
+		int rot_speed = 0;
+
+		double j_forward;
+		double j_strafe;
+		double j_rotate;
+
+		units::velocity::feet_per_second_t forward;
+		units::velocity::feet_per_second_t strafe;
+		units::angular_velocity::degrees_per_second_t rotate;
 	};
