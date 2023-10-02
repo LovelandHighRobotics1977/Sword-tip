@@ -5,6 +5,7 @@
 #include "Robot.h"
 
 void Robot::RobotInit() {
+
 	frc::SmartDashboard::PutString("Match State","   Disabled");
 	frc::SmartDashboard::PutString("Robot Name",Swordtip::Misc::Robot_Name);
 
@@ -30,16 +31,25 @@ void Robot::RobotInit() {
 	*/
 }
 void Robot::RobotPeriodic() {
+
 	robot_position = m_swerve.UpdateOdometry();
+
+	driver.update();
+	shooter.update();
+
 }
 
 void Robot::AutonomousInit() {
+
 	frc::SmartDashboard::PutString("Match State","   Autonomous");
+
 	m_swerve.Drive(0_mps,0_mps,0_deg_per_s,0,Swordtip::Frame::RotationPoints::Center);
 	m_swerve.SetNeutralMode(Brake);
-	timer.Start();
+	
 	timer.Restart();
+
 	gyro->Reset();
+
 }
 void Robot::AutonomousPeriodic() {
 
@@ -87,27 +97,29 @@ void Robot::AutonomousPeriodic() {
 }
 
 void Robot::TeleopInit() {
-	gyro->Reset();
-	m_swerve.SetNeutralMode(Brake);
+
 	frc::SmartDashboard::PutString("Match State","   TeleOperated");
+
+	m_swerve.SetNeutralMode(Brake);
+	
+	gyro->Reset();
+
 }
 
 void Robot::TeleopPeriodic() {
+	
 	// Reset Gyro
-	if(m_Joystick.GetRawButton(2)){
+	if(driver.gyro_reset){
 		gyro->Reset();
 	}
-	
-	// Determine if robot is driving field oriented or robot oriented
-	field_oriented = !m_Joystick.GetRawButton(6);
 
-	// Control any attached mechanisms
-	m_cubeArm.SetAngle(m_Xbox.GetLeftTriggerAxis() > 0,m_Xbox.GetRightTriggerAxis() > 0);
-	m_cubeArm.SetIntake(m_Xbox.GetLeftBumper(), m_Xbox.GetRightBumper());
-	m_cubeArm.SetSpeed(m_Xbox.GetXButton(), m_Xbox.GetYButton(), m_Xbox.GetBButton());
+	// Control mechanism
+	m_cubeArm.SetAngle(shooter.angle_up, shooter.angle_down);
+	m_cubeArm.SetIntake(shooter.intake_in, shooter.intake_out);
+	m_cubeArm.SetSpeed(shooter.speed_slow, shooter.speed_medium, shooter.speed_fast);
 	
 	// Select rotation speed from triggers
-	switch ((m_Joystick.GetRawButton(1) + m_Joystick.GetRawButton(15))){
+	switch ((driver.trigger_one + driver.trigger_two)){
 	case 0:
 		center_of_rotation = Swordtip::Frame::RotationPoints::Center;
 		rotation_speed = Swordtip::Velocity::Rotation::Slow;
@@ -124,27 +136,21 @@ void Robot::TeleopPeriodic() {
 		break;
 	}
 
-	j_forward = m_Joystick.GetY();
-	j_strafe = -m_Joystick.GetX();
-	j_rotate = m_Joystick.GetRawAxis(5);
-
-	throttle = ((1 - ((m_Joystick.GetZ() + 1) / 2)));
-
-	forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(j_forward, 0.2)) * throttle) * Swordtip::Velocity::Maximums::Max_Speed;
-	strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(j_strafe, 0.2)) * throttle) * Swordtip::Velocity::Maximums::Max_Speed;
-	rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(j_rotate, 0.3)) * sqrt(throttle)) * rotation_speed;
+	forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(driver.forward, 0.2)) * driver.throttle) * Swordtip::Velocity::Maximums::Max_Speed;
+	strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(driver.strafe, 0.2)) * driver.throttle) * Swordtip::Velocity::Maximums::Max_Speed;
+	rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(driver.rotate, 0.3)) * sqrt(driver.throttle)) * rotation_speed;
 
 	// Drive the swerve modules
-	if(m_Joystick.GetRawButton(5)){
+	if(driver.emergency_stop){
 		// Emergency braking (Button 5)
 		m_swerve.HaltRobot();
 	}else{
 		// Normal Drive
-		m_swerve.Drive(forward, strafe, rotate, field_oriented, center_of_rotation);
+		m_swerve.Drive(forward, strafe, rotate, driver.field_oriented, center_of_rotation);
 	}
 
 	// Put values to SmartDashboard
-	frc::SmartDashboard::PutNumber("throttle", throttle);
+	frc::SmartDashboard::PutNumber("throttle", driver.throttle);
 	
 	frc::SmartDashboard::PutNumber("Angle", static_cast<int>(gyro->GetYaw()));
 	frc::SmartDashboard::PutNumber("X_POS", robot_position.X().value());

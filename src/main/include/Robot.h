@@ -85,6 +85,7 @@ THATS ALL THANKS BYE!!!
 
 #include "Drivetrain.h"
 #include "Mechanism.h"
+#include "Controllers.h"
 
 class Robot : public frc::TimedRobot {
 	public:
@@ -104,8 +105,8 @@ class Robot : public frc::TimedRobot {
 		void TestPeriodic() override;
 
 	private:
-		frc::Joystick m_Joystick{0};
-		frc::XboxController m_Xbox{1};
+		Control::Drive driver{};
+		Control::Mechanism shooter{};
 
 		cs::UsbCamera r_driveCam;
 		cs::UsbCamera r_armCam;
