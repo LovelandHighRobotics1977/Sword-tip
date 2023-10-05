@@ -44,7 +44,7 @@ class Control {
 			throttle = ((1 - ((m_Joystick.GetZ() + 1) / 2)));
 
 			forward = m_Joystick.GetY();
-			strafe = m_Joystick.GetX();
+			strafe = -m_Joystick.GetX();
 			rotate = m_Joystick.GetRawAxis(5);
 		}
 	};

@@ -48,7 +48,7 @@ class Drivetrain {
 		double current_angle;
 
 		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
-		double speed_multiplier[5] = {0.30, 0.15, 0.10, 0.08, 0.00};  // Associated motor speeds
+		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
 
 		int angle_threshold;
 

@@ -34,9 +34,6 @@ void Robot::RobotPeriodic() {
 
 	robot_position = m_swerve.UpdateOdometry();
 
-	driver.update();
-	shooter.update();
-
 }
 
 void Robot::AutonomousInit() {
@@ -75,7 +72,7 @@ void Robot::AutonomousPeriodic() {
 		case 2: 
 			// Stop the intake and drive quickly away going slightly to the right
 			m_cubeArm.SetIntake(0,0);
-			m_swerve.Drive(Swordtip::Velocity::Maximums::Max_Speed,0.2_fps,0_deg_per_s,1,Swordtip::Frame::RotationPoints::Center);
+			m_swerve.Drive(Swordtip::Velocity::Maximums::Max_Speed,5_fps,0_deg_per_s,1,Swordtip::Frame::RotationPoints::Center);
 			break;
 
 		case 3: 
@@ -107,7 +104,10 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-	
+
+	driver.update();
+	shooter.update();
+
 	// Reset Gyro
 	if(driver.gyro_reset){
 		gyro->Reset();
@@ -148,6 +148,8 @@ void Robot::TeleopPeriodic() {
 		// Normal Drive
 		m_swerve.Drive(forward, strafe, rotate, driver.field_oriented, center_of_rotation);
 	}
+
+	std::cout<<rotate.value()<<std::endl;
 
 	// Put values to SmartDashboard
 	frc::SmartDashboard::PutNumber("throttle", driver.throttle);

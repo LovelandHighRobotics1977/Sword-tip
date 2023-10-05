@@ -32,9 +32,9 @@ void Drivetrain::AutoBalance(){
 	}
 
 	if(current_angle > 0){
-		chosen_speed = speed_multiplier[angle_threshold - 1];
+		chosen_speed = speed_multiplier[angle_threshold];
 	}else if(current_angle < 0){
-		chosen_speed = -speed_multiplier[angle_threshold - 1];
+		chosen_speed = -speed_multiplier[angle_threshold];
 	}
 
 	Drive(0_fps,Swordtip::Velocity::Maximums::Max_Speed * chosen_speed,0_deg_per_s,0,Swordtip::Frame::RotationPoints::Center);
