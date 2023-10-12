@@ -7,12 +7,9 @@ frc::Joystick m_Joystick{0};
 frc::XboxController m_Xbox{1};
 
 class Control {
-	private:
-		
-	
 	public:
 
-// Sets all variables
+	// Sets all variables
 
 	class Drive {
 	public:

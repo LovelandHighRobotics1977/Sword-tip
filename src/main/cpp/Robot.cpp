@@ -62,8 +62,6 @@ void Robot::AutonomousInit() {
 
 	gyro->Reset();
 
-	autoMode = 2;
-
 }
 void Robot::AutonomousPeriodic() {
 	Task fire_cube = {
@@ -71,60 +69,92 @@ void Robot::AutonomousPeriodic() {
 		[this](){ m_cubeArm.SetIntake(0,0); },
 		0, 1
 	};
-	Task leave_zone = {
-		[this](){ 
-			switch (autoMode){
-				case 1:
-				//right
-					m_swerve.Drive(DriveData {1_fps,1_fps});
-					break;
-				case 2:
-				//mid
-					m_swerve.Drive(DriveData {2_fps,0_fps});
-					break;
-				case 3:
-				//left
-					m_swerve.Drive(DriveData {3_fps, -2_fps});
-					break;
-			}}, 
+
+// Slot One Auto
+
+	Task s1_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {1_fps,1_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
-	Task move_forward = {
-		[this](){ 
-			switch (autoMode)
-			{
-				case 1:
-					m_swerve.Drive(DriveData {3_fps});
-					break;
-				case 2:
-					m_swerve.Drive(DriveData {2_fps, 0_fps});
-					break;
-				case 3:
-					m_swerve.Drive(DriveData {10_fps, 0_fps});
-					break;
-			}; 
-			},
+	Task s1_move_forward = {
+		[this](){ m_swerve.Drive(DriveData {3_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
-	Task wait_for_teleop = {
+	Task s1_wait_for_teleop = {
 		[this](){ m_swerve.Drive(DriveData {}); },
 		[this](){ pass(); },
 		3
 	};
-
-	Task Tasks[4] = {
+	Task s1_auto[4] = {
 		fire_cube,
-		leave_zone,
-		move_forward,
-		wait_for_teleop
+		s1_leave_zone,
+		s1_move_forward,
+		s1_wait_for_teleop
 	};
 
-	for (int i = 0; i < (int) std::size(Tasks); i++){
-		ExecuteTask(timer.Get().value(),Tasks[i]);
+// Slot Two Auto
+
+	Task s2_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {2_fps}); }, 
+		[this](){ pass(); },
+		1, 6
+	};
+	Task s2_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		6
+	};
+	Task s2_auto[3] = {
+		fire_cube,
+		s2_leave_zone,
+		s2_wait_for_teleop
+	};
+
+// Slot Three Auto
+
+	Task s3_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {1_fps,-1_fps}); }, 
+		[this](){ pass(); },
+		1, 2
+	};
+	Task s3_move_forward = {
+		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ pass(); },
+		2, 3
+	};
+	Task s3_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		3
+	};
+	Task s3_auto[4] = {
+		fire_cube,
+		s3_leave_zone,
+		s3_move_forward,
+		s3_wait_for_teleop
+	};
+
+// Execute Auto
+
+	switch (auto_mode){
+		case 1:
+			for (int i = 0; i < (int) std::size(s1_auto); i++){
+				ExecuteTask(timer.Get().value(),s1_auto[i]);
+			}
+			break;
+		case 2:
+			for (int i = 0; i < (int) std::size(s2_auto); i++){
+				ExecuteTask(timer.Get().value(),s2_auto[i]);
+			}
+			break;
+		case 3:
+			for (int i = 0; i < (int) std::size(s3_auto); i++){
+				ExecuteTask(timer.Get().value(),s3_auto[i]);
+			}
+			break;
 	}
-	
 }
 
 void Robot::TeleopInit() {
@@ -136,7 +166,6 @@ void Robot::TeleopInit() {
 	gyro->Reset();
 
 }
-
 void Robot::TeleopPeriodic() {
 	// Update controller inputs
 	driver.update();
@@ -200,14 +229,16 @@ void Robot::DisabledInit() {
 	frc::SmartDashboard::PutString("Match State","   Disabled");
 	m_swerve.Drive(DriveData {});
 }
-void Robot::DisabledPeriodic() {}
+void Robot::DisabledPeriodic() {
+
+}
 
 void Robot::TestInit() {
 	frc::SmartDashboard::PutString("Match State","   Test");
 }
-void Robot::TestPeriodic() {}
+void Robot::TestPeriodic() {
 
-
+}
 
 #ifndef RUNNING_FRc_TESTS
 int main() {

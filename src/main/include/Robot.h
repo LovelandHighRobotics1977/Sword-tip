@@ -1,85 +1,6 @@
-/*---------------------------------------------------------------------------------------------
-
-License:
-
-Copyright (c) FIRST and other WPILib contributors.
-Open Source Software; you can modify and/or share it under the terms of
-the WPILib BSD license file in the root directory of this project.
-
-------------------------------------------------------------------------------------------------
-
-Howdy!
-Welcome to team 1977's Swerve drive code for our competiton bot in offseason 2023!
-This project is based on the 2022 example swerve drive kinematics project by WPI.
-This wonderful project made me extra suicidal, so be sure to enjoy it yourself!! :)
-
-All important global variables related to robot geometry are in the Headers.h file
-PDIF variables are declared in SwerveModule.h
-
-This project was made by Salem (Me, Lead Programmer 23-24), Josh (LP 22-23), Alexandra and Dean
-
-------------------------------------------------------------------------------------------------
-
-Special Features:
- - Support for Per-Module centers of rotation
- - Toggle between Driver and Robot oriented drive
- - Really shitty untested autonomous capibilities
- - A gyro script that allows instancing the gyro (very cool)
-
-------------------------------------------------------------------------------------------------
-
-Controls:
- Joystick (Robot):
- - X/Y				:	Robot position
- - Twist			:	Robot Angle
- - Trigger			:	Fast Rotation Mode
- - Thumb Button		:	Toggle Field/Robot Oriented (Default Field)
- - Throttle			:	Robot Movement Speed (Low throttle is Low speed)
-
- Controller (Arm):		
- - L Trigger		:	Angle DOWN
- - R Trigger		:	Angle UP
- - L Bumper			:	Extend OUT
- - R Bumper			:	Extend IN
- - L Stick Button	:	AUTO ARM UP
- - R Stick Button	:	AUTO ARM DOWN / RETRACT
- - B Button			:	Intake IN
- - A Button			:	Intake OUT
-
-------------------------------------------------------------------------------------------------
-
-Robot:
- |__Drivetrain
- |  |__Swerve Module
- |  |  |__Drive Motor
- |  |  |__Angle Motor
- |  |  |__Drive Encoder (In our case this is part of the motor, as we used falcon 500s)
- |  |  |__Angle Encoder 
- |  |__Gyro
- |     |__AHRS gyro
- |__Arm
- |  |__Intake Motor
- |  |__Angle Motor
- |  |__Extension Motor
- |  |__Angle Encoder
- |  |__Angle Limit Switch
- |  |__Extension Limit Switch
- |__Vision
- |  |__Limelight 2+ (Might use raspberryPi and webcams, no vision solution currently)
-
------------------------------------------------------------------------------------------------
-
-If you have any questions you can reach me at:
-
-	discord		:	uruplonstk
-	email		:	elessem3+whiplash@gmail.com
-	phone		:	(970)-825-6568
-	snapchat	:	itsthatalo
-	github		:	ThatAlo
-
-THATS ALL THANKS BYE!!!
-
----------------------------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -130,11 +51,12 @@ class Robot : public frc::TimedRobot {
 
 		Mechanism m_cubeArm{};
 
-
 // Auto Variables
+
 		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
 		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
-		int autoMode;
+
+		int auto_mode = 1;
 
 // Teleop variables
 

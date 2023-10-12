@@ -43,10 +43,10 @@
 #include <frc/Timer.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-// misc
+// cameras
 #include <cameraserver/CameraServer.h>
 
-// user defined
+// 1977 defined libraries
 #include "Gyro.h"
 
 // Variables for the robot swordtip
@@ -167,11 +167,6 @@ struct Task{
 	const std::function<void()>& end_function;
 	double start_time = 0;
 	double end_time = 15;
-};
-
-union Argument{
-	OdometryData odometry;
-	DriveData drive;
 };
 
 #endif /* !HEADERS_H */
