@@ -69,12 +69,12 @@ void Robot::AutonomousPeriodic() {
 		[this](){ m_cubeArm.SetIntake(0,0); },
 		0, 1
 	};
-	Task leave_zone = {
+	Task leave_zone_slot_1 = {
 		[this](){ m_swerve.Drive(DriveData {5_fps,5_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
-	Task move_forward = {
+	Task move_forward_slot_1 = {
 		[this](){ m_swerve.Drive(DriveData {11_fps}); },
 		[this](){ pass(); },
 		2, 3
@@ -87,15 +87,14 @@ void Robot::AutonomousPeriodic() {
 
 	Task Tasks[4] = {
 		fire_cube,
-		leave_zone,
-		move_forward,
+		leave_zone_slot_1,
+		move_forward_slot_1,
 		wait_for_teleop
 	};
 
 	for (int i = 0; i < (int) std::size(Tasks); i++){
 		ExecuteTask(timer.Get().value(),Tasks[i]);
 	}
-	
 }
 
 void Robot::TeleopInit() {
