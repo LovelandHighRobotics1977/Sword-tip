@@ -62,6 +62,8 @@ void Robot::AutonomousInit() {
 
 	gyro->Reset();
 
+	autoMode = 2;
+
 }
 void Robot::AutonomousPeriodic() {
 	Task fire_cube = {
@@ -69,13 +71,40 @@ void Robot::AutonomousPeriodic() {
 		[this](){ m_cubeArm.SetIntake(0,0); },
 		0, 1
 	};
-	Task leave_zone_slot_1 = {
-		[this](){ m_swerve.Drive(DriveData {5_fps,5_fps}); }, 
+	Task leave_zone = {
+		[this](){ 
+			switch (autoMode){
+				case 1:
+				//right
+					m_swerve.Drive(DriveData {1_fps,1_fps});
+					break;
+				case 2:
+				//mid
+					m_swerve.Drive(DriveData {2_fps,0_fps});
+					break;
+				case 3:
+				//left
+					m_swerve.Drive(DriveData {3_fps, -2_fps});
+					break;
+			}}, 
 		[this](){ pass(); },
 		1, 2
 	};
-	Task move_forward_slot_1 = {
-		[this](){ m_swerve.Drive(DriveData {11_fps}); },
+	Task move_forward = {
+		[this](){ 
+			switch (autoMode)
+			{
+				case 1:
+					m_swerve.Drive(DriveData {3_fps});
+					break;
+				case 2:
+					m_swerve.Drive(DriveData {2_fps, 0_fps});
+					break;
+				case 3:
+					m_swerve.Drive(DriveData {10_fps, 0_fps});
+					break;
+			}; 
+			},
 		[this](){ pass(); },
 		2, 3
 	};
@@ -87,14 +116,15 @@ void Robot::AutonomousPeriodic() {
 
 	Task Tasks[4] = {
 		fire_cube,
-		leave_zone_slot_1,
-		move_forward_slot_1,
+		leave_zone,
+		move_forward,
 		wait_for_teleop
 	};
 
 	for (int i = 0; i < (int) std::size(Tasks); i++){
 		ExecuteTask(timer.Get().value(),Tasks[i]);
 	}
+	
 }
 
 void Robot::TeleopInit() {
