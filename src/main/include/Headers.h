@@ -5,6 +5,9 @@
 #include <iostream>
 #include <math.h>
 #include <cmath>
+#include <variant>
+#include <vector>
+#include <functional>
 
 // frc kinematics
 #include <frc/geometry/Rotation2d.h>
@@ -46,14 +49,62 @@
 // user defined
 #include "Gyro.h"
 
-// Robot variables
+// Argument abstraction data types
+/**
+ * Data for driving the robot
+ * @param forward Forward movement of the robot in meters/sec.
+ * @param strafe Sideways movement of the robot in meters/sec.
+ * @param rotate Rotational movement of the robot in degrees/sec
+ * @param fieldRelative Is the robot being driven field oriented?
+ * @param centerOfRotation Robot center of rotation.
+*/
+struct DriveData{
+	units::feet_per_second_t forward;
+	units::feet_per_second_t strafe;
+	units::angular_velocity::degrees_per_second_t rotate;
+	bool fieldOriented;
+	frc::Translation2d centerOfRotation;
+};
+
+/**
+ * Data for updating and resetting odometry
+ * @param angle
+ * @param rearLeft_Position 
+ * @param frontLeft_Position 
+ * @param frontRight_Position 
+ * @param rearRight_Position 
+*/
+struct OdometryData{
+	frc::Rotation2d angle;
+	std::array<frc::SwerveModulePosition,4> positions;
+};
+
+struct Task{
+	double start_time;
+	double end_time;
+	const std::function<void()>& start_function;
+	const std::function<void()>& end_function;
+};
+
+union Argument{
+	OdometryData odometry;
+	DriveData drive;
+};
+
+// Variables for the robot swordtip
 namespace Swordtip{
+	/**
+	 * Misc robot variables
+	*/
 	namespace Misc {
 		static constexpr auto Robot_Name = "   1977 : Swordtip";
 		static constexpr double Drive_Gear_Ratio = 6.75; 										//	Gear ratio is L2 6.75:1
 		static constexpr double Conversion_Factor = 4096.0/ 360.0;
 	}
 	
+	/**
+	 * Frame measurments and important physical locations
+	*/
 	namespace Frame {
 		namespace Measurments {
 			static constexpr units::meter_t Length = 26_in;  									//  |Front left| frame to |rear left| frame
@@ -70,12 +121,17 @@ namespace Swordtip{
 			static constexpr frc::Translation2d Tower = {-10.5_in,0_in};						//  position of the robot tower
 		}					
 	}
-	
+	/**
+	 * Velocity maximums and presets
+	*/
 	namespace Velocity {
 		namespace Maximums {
 			static constexpr units::feet_per_second_t Max_Speed = 11_fps;                		//  max horizontal velocity 16.3 feet per second
 			static constexpr units::degrees_per_second_t Max_Rotation = 420_deg_per_s;   		//  max rotational velocity ~763 degrees per second
 		}
+		/**
+		 * Rotational velocity presets
+		*/
 		namespace Rotation {
 			static constexpr units::degrees_per_second_t Slow =  Maximums::Max_Rotation / 3;    //  140 degrees per second
 			static constexpr units::degrees_per_second_t Medium = Maximums::Max_Rotation / 2;   //  210 degrees per second
@@ -83,6 +139,9 @@ namespace Swordtip{
 		}
 	}
 
+	/**
+	 * PIDF values for the drivetrain falcon 500s
+	*/
 	namespace PIDF {
 		namespace Drive {
 				static constexpr double P = 0.001;
@@ -95,6 +154,25 @@ namespace Swordtip{
 				static constexpr double I = 0.0016;
 				static constexpr double D = 160;
 				static constexpr double F = 0;
+		}
+	}
+
+	/**
+	 * Preset DriveData values
+	*/
+	namespace Driving {
+		static constexpr DriveData Halt = {0_fps,0_fps,0_deg_per_s,0,{0_m,0_m}};
+	}
+
+	/**
+	 * Autonomus variables
+	*/
+	namespace Autonomous {
+		namespace Variable {
+			static constexpr double timer_resolution = 0.1;
+		}
+		namespace Tasks {
+
 		}
 	}
 }

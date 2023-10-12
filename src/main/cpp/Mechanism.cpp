@@ -33,18 +33,18 @@ void Mechanism::SetAngle(bool up, bool down){
 }
 
 void Mechanism::SetIntake(bool in, bool out){
-	switch(speed)
-	{
+	switch(speed){
 		case 1:
-		motorSpeed = 0.2;
-		break;
+			motorSpeed = 0.2;
+			break;
 		case 2:
-		motorSpeed = 0.4;
-		break;
+			motorSpeed = 0.4;
+			break;
 		case 3:
-		motorSpeed = 0.9;
-		break;
+			motorSpeed = 0.9;
+			break;
 	}
+
 	if(speed == 1){
 		frc::SmartDashboard::PutString("low","██");
 	}else{

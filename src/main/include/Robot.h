@@ -92,6 +92,8 @@ class Robot : public frc::TimedRobot {
 		void RobotInit() override;
 		void RobotPeriodic() override;
 
+		void ExecuteTask(double current_time, Task task);
+
 		void AutonomousInit() override;
 		void AutonomousPeriodic() override;
 
@@ -105,6 +107,7 @@ class Robot : public frc::TimedRobot {
 		void TestPeriodic() override;
 
 	private:
+
 		Control::Drive driver{};
 		Control::Mechanism shooter{};
 
@@ -129,11 +132,8 @@ class Robot : public frc::TimedRobot {
 
 
 // Auto Variables
-
-		int auto_stage = 0;
-
-		int current_time;
-
+		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
+		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
 
 // Teleop variables
 
@@ -141,17 +141,8 @@ class Robot : public frc::TimedRobot {
 
 		units::degrees_per_second_t rotation_speed = 0_deg_per_s;
 
-		double throttle;
-
-		bool field_oriented;
-
-		int rot_speed = 0;
-
-		double j_forward;
-		double j_strafe;
-		double j_rotate;
-
 		units::velocity::feet_per_second_t forward;
 		units::velocity::feet_per_second_t strafe;
 		units::angular_velocity::degrees_per_second_t rotate;
+
 	};

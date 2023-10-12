@@ -15,46 +15,55 @@ class Drivetrain {
 		Drivetrain(){
 			gyro->Reset();
 		}
-		
+
 		/**
-		 * Drives the swerve robot
-		 * @param forward Forward movement of the robot in meters/sec.
-		 * @param strafe Sideways movement of the robot in meters/sec.
-		 * @param rotate Rotational movement of the robot in degrees/sec
-		 * @param fieldRelative Is the robot being driven field oriented?
-		 * @param centerOfRotation Robot center of rotation.
+		 * Drives the swerve robot by taking in a DriveData array
+		 * @param DriveData A DriveData array used to drive the robot
 		*/
-		void Drive(units::meters_per_second_t forward, units::meters_per_second_t strafe, units::degrees_per_second_t rotate, bool fieldRelative, frc::Translation2d centerOfRotation);
+		void Drive(DriveData);
+
 		/**
-		 * Updates the swerve drive odometry
-		 * @param robotAngle the angle of the robot as a rotation2D
-		 * @return returns a pose2d of the robot's position on the field.
+		 * Calculates the DriveData to auto balance the robot on the charge station
+		 * @param angles Angles to change speed on
+		 * @param speeds Speed to set in relation to current angle
+		 * @return Returns a DriveData array to drive the robot
 		*/
+		DriveData AutoBalance(double angles[5], double speeds[5], double current_angle);
 
-		void AutoBalance();
-
-		void HaltRobot();
-
+		/**
+		 * Sets the neutral mode of the drivetrain
+		 * @param mode Phoenix library motor speed to set motors to
+		*/
 		void SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode mode);
 
+		/**
+		 * Gets the swerve drive odometry values
+		 * @return returns a pose2d of the robot's position on the field.
+		*/
+		frc::Pose2d GetOdometry();
+
+		/**
+		 * Updates the swerve drive odometry and returns the value
+		 * @return returns a pose2d of the robot's position on the field.
+		*/
 		frc::Pose2d UpdateOdometry();
 
-		void ResetOdometry();
-		
+		/**
+		 * Resets the odometry
+		 * @param position The pose2D of the position of the robot
+		*/
+		void ResetOdometry(frc::Pose2d position);
 
 	private:
+
 		Gyro* gyro = Gyro::GetInstance();
-
-		double current_angle;
-
-		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
-		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
 
 		int angle_threshold;
 
 		double chosen_speed;
 
-		//gear ratio is L2 6.75:1
+		frc::ChassisSpeeds field_oriented_speeds;
+		frc::ChassisSpeeds robot_oriented_speeds;
 
 		// This is not how it should be but doing it "correctly" (-+,++,+-,--) causes
 		// the wheels to form an "X" instead of diamond while turning.
@@ -75,7 +84,9 @@ class Drivetrain {
 
 		frc::SwerveDriveKinematics<4> m_kinematics{m_rearLeftLocation, m_frontLeftLocation, m_frontRightLocation, m_rearRightLocation};
 
-		frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, 
+		// Odometry Ballshart
+
+		frc::SwerveDriveOdometry<4> m_odometry{m_kinematics,
 												gyro->GetRotation2d(),
 												{
 											   		m_rearLeft.GetPosition(),  m_frontLeft.GetPosition(), 

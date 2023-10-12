@@ -50,11 +50,4 @@ class SwerveModule {
 		double drivekI = 0;
 		double drivekD = 0.005;
 		double drivekF = 1;
-
-		double anglekP = 1.7;
-		double anglekI = 0.0016;
-		double anglekD = 160;
-		double anglekF = 0;
-
-		frc::Rotation2d angle = units::degree_t{0};
 };
