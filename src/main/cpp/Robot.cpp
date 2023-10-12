@@ -63,7 +63,6 @@ void Robot::AutonomousInit() {
 	gyro->Reset();
 
 }
-
 void Robot::AutonomousPeriodic() {
 	Task fire_cube = {
 		[this](){ m_cubeArm.SetIntake(0,1); }, 
@@ -83,7 +82,7 @@ void Robot::AutonomousPeriodic() {
 	Task wait_for_teleop = {
 		[this](){ m_swerve.Drive(DriveData {}); },
 		[this](){ pass(); },
-		3, 15
+		3
 	};
 
 	Task Tasks[4] = {

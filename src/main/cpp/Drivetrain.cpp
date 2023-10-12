@@ -36,7 +36,7 @@ DriveData Drivetrain::AutoBalance(double angles[5], double speeds[5], double cur
 		chosen_speed = -speeds[angle_threshold];
 	}
 
-	return(DriveData {0_fps,Swordtip::Velocity::Maximums::Max_Speed * chosen_speed,0_deg_per_s,0,Swordtip::Frame::RotationPoints::Center});
+	return(DriveData {0_fps,Swordtip::Velocity::Maximums::Max_Speed * chosen_speed});
 }
 
 void Drivetrain::SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode mode){

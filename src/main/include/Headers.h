@@ -122,9 +122,6 @@ namespace Swordtip{
 		namespace Variable {
 			static constexpr double timer_resolution = 0.1;
 		}
-		namespace Tasks {
-
-		}
 	}
 }
 
