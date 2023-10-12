@@ -4,6 +4,8 @@
 
 #include "Robot.h"
 
+void pass(){}
+
 void Robot::RobotInit() {
 
 	frc::SmartDashboard::PutString("Match State","   Disabled");
@@ -15,7 +17,7 @@ void Robot::RobotInit() {
 	frc::SmartDashboard::PutNumber("X_VEL", 0);
 	frc::SmartDashboard::PutNumber("Y_VEL", 0);
 
-	m_swerve.Drive(Swordtip::Driving::Halt);
+	m_swerve.Drive(DriveData {});
 	m_cubeArm.SetIntake(0,0);
 	m_cubeArm.SetAngle(0,0);
 	m_cubeArm.SetSpeed(0,0,0);
@@ -50,7 +52,7 @@ void Robot::AutonomousInit() {
 
 	frc::SmartDashboard::PutString("Match State","   Autonomous");
 
-	m_swerve.Drive(Swordtip::Driving::Halt);
+	m_swerve.Drive(DriveData {});
 	m_swerve.SetNeutralMode(Brake);
 	m_swerve.ResetOdometry({0_m,0_m,0_deg});
 
@@ -63,16 +65,32 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-	Task fire_cube = {0, 1,
+	Task fire_cube = {
 		[this](){ m_cubeArm.SetIntake(0,1); }, 
-		[this](){ m_cubeArm.SetIntake(0,0); }};
-	Task stop_robot = {1, 3,
-		[this](){ m_swerve.Drive(Swordtip::Driving::Halt); }, 
-		[this](){ m_swerve.Drive(Swordtip::Driving::Halt); }};
+		[this](){ m_cubeArm.SetIntake(0,0); },
+		0, 1
+	};
+	Task leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {5_fps,5_fps}); }, 
+		[this](){ pass(); },
+		1, 2
+	};
+	Task move_forward = {
+		[this](){ m_swerve.Drive(DriveData {11_fps}); },
+		[this](){ pass(); },
+		2, 3
+	};
+	Task wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		3, 15
+	};
 
-	Task Tasks[2] = {
+	Task Tasks[4] = {
 		fire_cube,
-		stop_robot
+		leave_zone,
+		move_forward,
+		wait_for_teleop
 	};
 
 	for (int i = 0; i < (int) std::size(Tasks); i++){
@@ -132,7 +150,7 @@ void Robot::TeleopPeriodic() {
 	// Drive the swerve modules
 	if(driver.emergency_stop){
 		// Emergency braking (Button 5)
-		m_swerve.Drive(Swordtip::Driving::Halt);
+		m_swerve.Drive(DriveData {});
 	}else{
 		// Normal Drive
 		m_swerve.Drive({forward, strafe, rotate, driver.field_oriented, center_of_rotation});
@@ -152,7 +170,7 @@ void Robot::TeleopPeriodic() {
 
 void Robot::DisabledInit() {
 	frc::SmartDashboard::PutString("Match State","   Disabled");
-	m_swerve.Drive(Swordtip::Driving::Halt);
+	m_swerve.Drive(DriveData {});
 }
 void Robot::DisabledPeriodic() {}
 

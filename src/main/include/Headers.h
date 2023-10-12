@@ -49,48 +49,6 @@
 // user defined
 #include "Gyro.h"
 
-// Argument abstraction data types
-/**
- * Data for driving the robot
- * @param forward Forward movement of the robot in meters/sec.
- * @param strafe Sideways movement of the robot in meters/sec.
- * @param rotate Rotational movement of the robot in degrees/sec
- * @param fieldRelative Is the robot being driven field oriented?
- * @param centerOfRotation Robot center of rotation.
-*/
-struct DriveData{
-	units::feet_per_second_t forward;
-	units::feet_per_second_t strafe;
-	units::angular_velocity::degrees_per_second_t rotate;
-	bool fieldOriented;
-	frc::Translation2d centerOfRotation;
-};
-
-/**
- * Data for updating and resetting odometry
- * @param angle
- * @param rearLeft_Position 
- * @param frontLeft_Position 
- * @param frontRight_Position 
- * @param rearRight_Position 
-*/
-struct OdometryData{
-	frc::Rotation2d angle;
-	std::array<frc::SwerveModulePosition,4> positions;
-};
-
-struct Task{
-	double start_time;
-	double end_time;
-	const std::function<void()>& start_function;
-	const std::function<void()>& end_function;
-};
-
-union Argument{
-	OdometryData odometry;
-	DriveData drive;
-};
-
 // Variables for the robot swordtip
 namespace Swordtip{
 	/**
@@ -158,13 +116,6 @@ namespace Swordtip{
 	}
 
 	/**
-	 * Preset DriveData values
-	*/
-	namespace Driving {
-		static constexpr DriveData Halt = {0_fps,0_fps,0_deg_per_s,0,{0_m,0_m}};
-	}
-
-	/**
 	 * Autonomus variables
 	*/
 	namespace Autonomous {
@@ -176,5 +127,54 @@ namespace Swordtip{
 		}
 	}
 }
+
+// Argument abstraction data types
+/**
+ * Data for driving the robot
+ * @param forward Forward movement of the robot in meters/sec.
+ * @param strafe Sideways movement of the robot in meters/sec.
+ * @param rotate Rotational movement of the robot in degrees/sec
+ * @param fieldRelative Is the robot being driven field oriented?
+ * @param centerOfRotation Robot center of rotation.
+*/
+struct DriveData{
+	units::feet_per_second_t forward = 0_fps;
+	units::feet_per_second_t strafe = 0_fps;
+	units::angular_velocity::degrees_per_second_t rotate = 0_deg_per_s;
+	bool fieldOriented = 0;
+	frc::Translation2d centerOfRotation = Swordtip::Frame::RotationPoints::Center;
+};
+
+/**
+ * Data for updating and resetting odometry
+ * @param angle
+ * @param rearLeft_Position 
+ * @param frontLeft_Position 
+ * @param frontRight_Position 
+ * @param rearRight_Position 
+*/
+struct OdometryData{
+	frc::Rotation2d angle;
+	std::array<frc::SwerveModulePosition,4> positions;
+};
+
+/**
+ * Data for an autonomous task
+ * @param start_function the function to execute at the start time
+ * @param end_function the function to execute at the end time
+ * @param start_time start time, defaults to 0 seconds
+ * @param end_time end time, defaults to 15 seconds
+*/
+struct Task{
+	const std::function<void()>& start_function;
+	const std::function<void()>& end_function;
+	double start_time = 0;
+	double end_time = 15;
+};
+
+union Argument{
+	OdometryData odometry;
+	DriveData drive;
+};
 
 #endif /* !HEADERS_H */
