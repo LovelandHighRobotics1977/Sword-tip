@@ -7,7 +7,7 @@
 SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,       const int angleEncoderID, double magnetOffset)
 					  : m_driveMotor{driveMotorID}, m_angleMotor{angleMotorID}, m_angleEncoder{angleEncoderID} {
 
-// Drive motor configs
+	#pragma region // Drive motor configs
 
 	m_driveMotor.ConfigFactoryDefault();
 
@@ -25,7 +25,9 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 	m_driveMotor.ConfigPeakOutputForward(1);
 	m_driveMotor.ConfigPeakOutputReverse(-1);
 
-// Angle motor configs
+	#pragma endregion
+
+	#pragma region // Angle motor configs
 
 	m_angleMotor.ConfigFactoryDefault();
 
@@ -48,16 +50,23 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 	m_angleMotor.ConfigPeakOutputForward(1);
 	m_angleMotor.ConfigPeakOutputReverse(-1);
 
-// Encoder configs
+	#pragma endregion
+
+	#pragma region // Encoder configs
 
 	m_angleEncoder.ConfigMagnetOffset(magnetOffset);
 	m_angleEncoder.SetPositionToAbsolute();
 	
-// Misc configs for initilization
+	#pragma endregion
+
+	#pragma region // Misc configs for initilization
 
 	m_angleMotor.Set(TalonFXControlMode::Position,0);
 
 	CANID = angleEncoderID;
+
+	#pragma endregion
+
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
@@ -76,34 +85,34 @@ frc::SwerveModuleState SwerveModule::Optimize(const frc::SwerveModuleState& desi
 	}
 }
 
-void SwerveModule::SetDesiredState(
-	const frc::SwerveModuleState& desiredState) {
+void SwerveModule::SetDesiredState(const frc::SwerveModuleState& desiredState) {
 
-		// Optimize the desired state to avoid angling the wheel further than 90 degrees in one go
-		auto const [optimized_speed, optimized_angle] = Optimize(desiredState, getAngle(), true);
+	// Optimize the desired state to avoid angling the wheel further than 90 degrees in one go
+	auto const [optimized_speed, optimized_angle] = Optimize(desiredState, getAngle(), true);
 
-		switch (CANID){
-		case 2:
-			frc::SmartDashboard::PutNumber("Front Right angle", optimized_angle.Degrees().value());
-			frc::SmartDashboard::PutNumber("Front Right speed", optimized_speed.value());
-			break;
-		case 5:
-			frc::SmartDashboard::PutNumber("Rear Right angle", optimized_angle.Degrees().value());
-			frc::SmartDashboard::PutNumber("Rear Right speed", optimized_speed.value());
-			break;
-		case 8:
-			frc::SmartDashboard::PutNumber("Rear Left angle", optimized_angle.Degrees().value());
-			frc::SmartDashboard::PutNumber("Rear Left speed", optimized_speed.value());
-			break;
-		case 11:
-			frc::SmartDashboard::PutNumber("Front Left angle", optimized_angle.Degrees().value());
-			frc::SmartDashboard::PutNumber("Front Left speed", optimized_speed.value());
-			break;
-		}
+	// Module data to Dashboard
+	switch (CANID){
+	case 2:
+		frc::SmartDashboard::PutNumber("Front Right angle", optimized_angle.Degrees().value());
+		frc::SmartDashboard::PutNumber("Front Right speed", optimized_speed.value());
+		break;
+	case 5:
+		frc::SmartDashboard::PutNumber("Rear Right angle", optimized_angle.Degrees().value());
+		frc::SmartDashboard::PutNumber("Rear Right speed", optimized_speed.value());
+		break;
+	case 8:
+		frc::SmartDashboard::PutNumber("Rear Left angle", optimized_angle.Degrees().value());
+		frc::SmartDashboard::PutNumber("Rear Left speed", optimized_speed.value());
+		break;
+	case 11:
+		frc::SmartDashboard::PutNumber("Front Left angle", optimized_angle.Degrees().value());
+		frc::SmartDashboard::PutNumber("Front Left speed", optimized_speed.value());
+		break;
+	}
 
-		// Set the motor outputs.
-		m_driveMotor.Set((double) optimized_speed);
-		m_angleMotor.Set(TalonFXControlMode::Position, optimized_angle.Degrees().value()*(Swordtip::Misc::Conversion_Factor));
+	// Set the motor outputs.
+	m_driveMotor.Set((double) optimized_speed);
+	m_angleMotor.Set(TalonFXControlMode::Position, optimized_angle.Degrees().value()*(Swordtip::Misc::Conversion_Factor));
 }
 
 void SwerveModule::SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode mode){
