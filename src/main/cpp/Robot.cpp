@@ -64,14 +64,16 @@ void Robot::AutonomousInit() {
 
 }
 void Robot::AutonomousPeriodic() {
+
+	#pragma region // Common
 	Task fire_cube = {
 		[this](){ m_cubeArm.SetIntake(0,1); }, 
 		[this](){ m_cubeArm.SetIntake(0,0); },
 		0, 1
 	};
+	#pragma endregion
 
-// Slot One Auto
-
+	#pragma region // Slot One
 	Task s1_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {1_fps,1_fps}); }, 
 		[this](){ pass(); },
@@ -93,9 +95,9 @@ void Robot::AutonomousPeriodic() {
 		s1_move_forward,
 		s1_wait_for_teleop
 	};
+	#pragma endregion
 
-// Slot Two Auto
-
+	#pragma region // Slot Two
 	Task s2_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {2_fps}); }, 
 		[this](){ pass(); },
@@ -111,9 +113,9 @@ void Robot::AutonomousPeriodic() {
 		s2_leave_zone,
 		s2_wait_for_teleop
 	};
+	#pragma endregion
 
-// Slot Three Auto
-
+	#pragma region // Slot Three
 	Task s3_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {1_fps,-1_fps}); }, 
 		[this](){ pass(); },
@@ -135,9 +137,9 @@ void Robot::AutonomousPeriodic() {
 		s3_move_forward,
 		s3_wait_for_teleop
 	};
+	#pragma endregion
 
-// Execute Auto
-
+	#pragma region // Execute Tasks
 	switch (auto_mode){
 		case 1:
 			for (int i = 0; i < (int) std::size(s1_auto); i++){
@@ -155,6 +157,8 @@ void Robot::AutonomousPeriodic() {
 			}
 			break;
 	}
+	#pragma endregion
+	
 }
 
 void Robot::TeleopInit() {
