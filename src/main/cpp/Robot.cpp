@@ -34,6 +34,8 @@ void Robot::RobotInit() {
 }
 void Robot::RobotPeriodic() {
 
+	frc::SmartDashboard::PutNumber("Angle", static_cast<int>(gyro->GetYaw()));
+
 	robot_position = m_swerve.UpdateOdometry();
 
 }
@@ -99,7 +101,7 @@ void Robot::AutonomousPeriodic() {
 
 	#pragma region // Slot Two
 	Task s2_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {2_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
 		[this](){ pass(); },
 		1, 6
 	};
@@ -117,7 +119,7 @@ void Robot::AutonomousPeriodic() {
 
 	#pragma region // Slot Three
 	Task s3_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {1_fps,-1_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {1_fps,-0.5_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
@@ -158,7 +160,7 @@ void Robot::AutonomousPeriodic() {
 			break;
 	}
 	#pragma endregion
-	
+
 }
 
 void Robot::TeleopInit() {
@@ -166,8 +168,6 @@ void Robot::TeleopInit() {
 	frc::SmartDashboard::PutString("Match State","   TeleOperated");
 
 	m_swerve.SetNeutralMode(Brake);
-	
-	gyro->Reset();
 
 }
 void Robot::TeleopPeriodic() {
@@ -220,7 +220,6 @@ void Robot::TeleopPeriodic() {
 	// Put values to SmartDashboard
 	frc::SmartDashboard::PutNumber("throttle", driver.throttle);
 	
-	frc::SmartDashboard::PutNumber("Angle", static_cast<int>(gyro->GetYaw()));
 	frc::SmartDashboard::PutNumber("X_POS", robot_position.X().value());
 	frc::SmartDashboard::PutNumber("Y_POS", robot_position.Y().value());
 
