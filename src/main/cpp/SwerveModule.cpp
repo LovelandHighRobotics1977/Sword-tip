@@ -56,6 +56,8 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 
 	m_angleEncoder.ConfigMagnetOffset(magnetOffset);
 	m_angleEncoder.SetPositionToAbsolute();
+
+	m_angleEncoder.ConfigAbsoluteSensorRange(AbsoluteSensorRange::Unsigned_0_to_360);
 	
 	#pragma endregion
 
@@ -70,7 +72,9 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
-	return {units::meter_t{(m_driveMotor.GetSelectedSensorPosition())*(((4*M_PI)/Swordtip::Misc::Drive_Gear_Ratio)/2048)}, gyro->GetRotation2d()};
+	auto distance = (((2 * M_PI * 2) / Swordtip::Misc::Drive_Gear_Ratio ) / 2048) * m_driveMotor.GetSelectedSensorPosition();
+	auto angle = ((2 * M_PI) / 360) * m_angleEncoder.GetAbsolutePosition();
+	return {units::meter_t{distance}, units::degree_t{angle}};
 }
 
 frc::Rotation2d SwerveModule::getAngle() {
@@ -78,8 +82,10 @@ frc::Rotation2d SwerveModule::getAngle() {
 }
 
 frc::SwerveModuleState SwerveModule::Optimize(const frc::SwerveModuleState& desiredState, const frc::Rotation2d& currentAngle, bool optimize){
+	return optimize ? frc::SwerveModuleState::Optimize(desiredState, getAngle()) : frc::SwerveModuleState{desiredState.speed,desiredState.angle};
+	
 	if(optimize){
-		return frc::SwerveModuleState::Optimize(desiredState, SwerveModule::getAngle());
+		return frc::SwerveModuleState::Optimize(desiredState, getAngle());
 	}else{
 		return frc::SwerveModuleState{desiredState.speed,desiredState.angle};
 	}

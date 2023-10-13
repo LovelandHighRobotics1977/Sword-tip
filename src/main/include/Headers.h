@@ -138,7 +138,7 @@ struct DriveData{
 	units::feet_per_second_t forward = 0_fps;
 	units::feet_per_second_t strafe = 0_fps;
 	units::angular_velocity::degrees_per_second_t rotate = 0_deg_per_s;
-	bool fieldOriented = 0;
+	bool field_oriented = true;
 	frc::Translation2d centerOfRotation = Swordtip::Frame::RotationPoints::Center;
 };
 

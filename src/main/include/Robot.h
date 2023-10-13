@@ -56,7 +56,9 @@ class Robot : public frc::TimedRobot {
 		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
 		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
 
-		int auto_mode = 1;
+		// THE IMPORTANT ONE
+
+		int auto_mode = 3;
 
 // Teleop variables
 
