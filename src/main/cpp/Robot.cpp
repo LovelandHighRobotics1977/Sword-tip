@@ -20,7 +20,7 @@ void Robot::RobotInit() {
 	m_swerve.Drive(DriveData {});
 	m_cubeArm.SetIntake(0,0);
 	m_cubeArm.SetAngle(0,0);
-	m_cubeArm.SetSpeed(0,0,0);
+	m_cubeArm.SetSpeed(ArmData {});
 
 	timer.Start();
 
@@ -57,28 +57,28 @@ void Robot::AutonomousInit() {
 	m_swerve.SetNeutralMode(Brake);
 	m_swerve.Drive(DriveData {});
 	m_swerve.ResetOdometry({0_m,0_m,0_deg});
-	m_cubeArm.SetSpeed(0,1,0);
 
 	// Prepare timer and gyro for auto
 	timer.Restart();
 	gyro->Reset();
 
-	// Select which autonomous to do
-	auto_task = 1;
-	auto_alliance = RED;
-
 }
 void Robot::AutonomousPeriodic() {
 
 	#pragma region COMMON
+	Task set_arm = {
+		[this](){ m_cubeArm.SetSpeed(Auto.node); }, 
+		[this](){ pass(); },
+		0, 1
+	};
 	Task fire_cube = {
 		[this](){ m_cubeArm.SetIntake(0,1); }, 
 		[this](){ m_cubeArm.SetIntake(0,0); },
-		0, 1
+		0.1, 1
 	};
 	#pragma endregion COMMON
 
-	#pragma region DO_NOTHING
+	#pragma region NOTHING
 	Task do_nothing = {
 		[this](){ pass(); }, 
 		[this](){ pass(); },
@@ -87,166 +87,172 @@ void Robot::AutonomousPeriodic() {
 	Task do_nothing_auto[1] = {
 		do_nothing
 	};
-	#pragma endregion DO_NOTHING
+	#pragma endregion NOTHING
 
 	#pragma region RED
 
-	#pragma region RED Slot ONE
-	Task s1_RED_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {1_fps,1_fps}); }, 
-		[this](){ pass(); },
-		1, 2
-	};
-	Task s1_RED_move_forward = {
-		[this](){ m_swerve.Drive(DriveData {3_fps}); },
-		[this](){ pass(); },
-		2, 3
-	};
-	Task s1_RED_wait_for_teleop = {
-		[this](){ m_swerve.Drive(DriveData {}); },
-		[this](){ pass(); },
-		3
-	};
-	Task s1_RED_auto[4] = {
-		fire_cube,
-		s1_RED_leave_zone,
-		s1_RED_move_forward,
-		s1_RED_wait_for_teleop
-	};
-	#pragma endregion RED Slot ONE
-
-	#pragma region RED Slot TWO
-	Task s2_RED_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
-		[this](){ pass(); },
-		1, 6
-	};
-	Task s2_RED_wait_for_teleop = {
-		[this](){ m_swerve.Drive(DriveData {}); },
-		[this](){ pass(); },
-		6
-	};
-	Task s2_RED_auto[3] = {
-		fire_cube,
-		s2_RED_leave_zone,
-		s2_RED_wait_for_teleop
-	};
-	#pragma endregion RED Slot TWO
-
-	#pragma region RED Slot THREE
-	Task s3_RED_leave_zone = {
+	#pragma region RED SHORT
+	Task short_RED_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {1_fps,-0.5_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
-	Task s3_RED_move_forward = {
+	Task short_RED_move_forward = {
 		[this](){ m_swerve.Drive(DriveData {3_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
-	Task s3_RED_wait_for_teleop = {
+	Task short_RED_wait_for_teleop = {
 		[this](){ m_swerve.Drive(DriveData {}); },
 		[this](){ pass(); },
 		3
 	};
-	Task s3_RED_auto[4] = {
+	Task short_RED_auto[5] = {
+		set_arm,
 		fire_cube,
-		s3_RED_leave_zone,
-		s3_RED_move_forward,
-		s3_RED_wait_for_teleop
+		short_RED_leave_zone,
+		short_RED_move_forward,
+		short_RED_wait_for_teleop
 	};
-	#pragma endregion RED Slot THREE
+	#pragma endregion RED SHORT
+
+	#pragma region RED MIDDLE
+	Task middle_RED_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
+		[this](){ pass(); },
+		1, 6
+	};
+	Task middle_RED_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		6
+	};
+	Task middle_RED_auto[4] = {
+		set_arm,
+		fire_cube,
+		middle_RED_leave_zone,
+		middle_RED_wait_for_teleop
+	};
+	#pragma endregion RED MIDDLE
+
+	#pragma region RED LONG
+	Task long_RED_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {1_fps,0.2_fps}); }, 
+		[this](){ pass(); },
+		1, 2
+	};
+	Task long_RED_move_forward = {
+		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ pass(); },
+		2, 3
+	};
+	Task long_RED_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		3
+	};
+	Task long_RED_auto[5] = {
+		set_arm,
+		fire_cube,
+		long_RED_leave_zone,
+		long_RED_move_forward,
+		long_RED_wait_for_teleop
+	};
+	#pragma endregion RED LONG
 
 	#pragma endregion RED
 
 	#pragma region BLUE
 
-	#pragma region BLUE Slot ONE
-	Task s1_BLUE_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {1_fps,-1_fps}); }, 
-		[this](){ pass(); },
-		1, 2
-	};
-	Task s1_BLUE_move_forward = {
-		[this](){ m_swerve.Drive(DriveData {3_fps}); },
-		[this](){ pass(); },
-		2, 3
-	};
-	Task s1_BLUE_wait_for_teleop = {
-		[this](){ m_swerve.Drive(DriveData {}); },
-		[this](){ pass(); },
-		3
-	};
-	Task s1_BLUE_auto[4] = {
-		fire_cube,
-		s1_BLUE_leave_zone,
-		s1_BLUE_move_forward,
-		s1_BLUE_wait_for_teleop
-	};
-	#pragma endregion BLUE Slot ONE
-
-	#pragma region BLUE Slot TWO
-	Task s2_BLUE_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
-		[this](){ pass(); },
-		1, 6
-	};
-	Task s2_BLUE_wait_for_teleop = {
-		[this](){ m_swerve.Drive(DriveData {}); },
-		[this](){ pass(); },
-		6
-	};
-	Task s2_BLUE_auto[3] = {
-		fire_cube,
-		s2_BLUE_leave_zone,
-		s2_BLUE_wait_for_teleop
-	};
-	#pragma endregion BLUE Slot TWO
-
-	#pragma region BLUE Slot THREE
-	Task s3_BLUE_leave_zone = {
+	#pragma region BLUE SHORT
+	Task short_BLUE_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {1_fps,0.5_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
-	Task s3_BLUE_move_forward = {
+	Task short_BLUE_move_forward = {
 		[this](){ m_swerve.Drive(DriveData {3_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
-	Task s3_BLUE_wait_for_teleop = {
+	Task short_BLUE_wait_for_teleop = {
 		[this](){ m_swerve.Drive(DriveData {}); },
 		[this](){ pass(); },
 		3
 	};
-	Task s3_BLUE_auto[4] = {
+	Task short_BLUE_auto[5] = {
+		set_arm,
 		fire_cube,
-		s3_BLUE_leave_zone,
-		s3_BLUE_move_forward,
-		s3_BLUE_wait_for_teleop
+		short_BLUE_leave_zone,
+		short_BLUE_move_forward,
+		short_BLUE_wait_for_teleop
 	};
-	#pragma endregion BLUE Slot THREE
+	#pragma endregion BLUE SHORT
+
+	#pragma region BLUE MIDDLE
+	Task middle_BLUE_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
+		[this](){ pass(); },
+		1, 6
+	};
+	Task middle_BLUE_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		6
+	};
+	Task middle_BLUE_auto[4] = {
+		set_arm,
+		fire_cube,
+		middle_BLUE_leave_zone,
+		middle_BLUE_wait_for_teleop
+	};
+	#pragma endregion BLUE MIDDLE
+
+	#pragma region BLUE LONG
+	Task long_BLUE_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {1_fps,-0.2_fps}); }, 
+		[this](){ pass(); },
+		1, 2
+	};
+	Task long_BLUE_move_forward = {
+		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ pass(); },
+		2, 3
+	};
+	Task long_BLUE_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		3
+	};
+	Task long_BLUE_auto[5] = {
+		set_arm,
+		fire_cube,
+		long_BLUE_leave_zone,
+		long_BLUE_move_forward,
+		long_BLUE_wait_for_teleop
+	};
+	#pragma endregion BLUE LONG
 
 	#pragma endregion BLUE
 
 	#pragma region EXECUTE
-	switch (auto_alliance){
+	switch (Auto.alliance){
 		// RED TEAM
 		case 1:
-			switch (auto_task){
+			switch (Auto.path){
 				case 1:
-					for (int i = 0; i < (int) std::size(s1_RED_auto); i++){
-						ExecuteTask(timer.Get().value(),s1_RED_auto[i]);
+					for (int i = 0; i < (int) std::size(short_RED_auto); i++){
+						ExecuteTask(timer.Get().value(),short_RED_auto[i]);
 					}
 					break;
 				case 2:
-					for (int i = 0; i < (int) std::size(s2_RED_auto); i++){
-						ExecuteTask(timer.Get().value(),s2_RED_auto[i]);
+					for (int i = 0; i < (int) std::size(middle_RED_auto); i++){
+						ExecuteTask(timer.Get().value(),middle_RED_auto[i]);
 					}
 					break;
 				case 3:
-					for (int i = 0; i < (int) std::size(s3_RED_auto); i++){
-						ExecuteTask(timer.Get().value(),s3_RED_auto[i]);
+					for (int i = 0; i < (int) std::size(long_RED_auto); i++){
+						ExecuteTask(timer.Get().value(),long_RED_auto[i]);
 					}
 					break;
 				default:
@@ -260,20 +266,20 @@ void Robot::AutonomousPeriodic() {
 		// BLUE TEAM
 		
 		case 2:
-			switch (auto_task){
+			switch (Auto.path){
 				case 1:
-					for (int i = 0; i < (int) std::size(s1_BLUE_auto); i++){
-						ExecuteTask(timer.Get().value(),s1_BLUE_auto[i]);
+					for (int i = 0; i < (int) std::size(short_BLUE_auto); i++){
+						ExecuteTask(timer.Get().value(),short_BLUE_auto[i]);
 					}
 					break;
 				case 2:
-					for (int i = 0; i < (int) std::size(s2_BLUE_auto); i++){
-						ExecuteTask(timer.Get().value(),s2_BLUE_auto[i]);
+					for (int i = 0; i < (int) std::size(middle_BLUE_auto); i++){
+						ExecuteTask(timer.Get().value(),middle_BLUE_auto[i]);
 					}
 					break;
 				case 3:
-					for (int i = 0; i < (int) std::size(s3_BLUE_auto); i++){
-						ExecuteTask(timer.Get().value(),s3_BLUE_auto[i]);
+					for (int i = 0; i < (int) std::size(long_BLUE_auto); i++){
+						ExecuteTask(timer.Get().value(),long_BLUE_auto[i]);
 					}
 					break;
 				default:
@@ -315,7 +321,7 @@ void Robot::TeleopPeriodic() {
 	// Control the mechanism
 	m_cubeArm.SetAngle(shooter.angle_up, shooter.angle_down);
 	m_cubeArm.SetIntake(shooter.intake_in, shooter.intake_out);
-	m_cubeArm.SetSpeed(shooter.speed_slow, shooter.speed_medium, shooter.speed_fast);
+	m_cubeArm.SetSpeed({shooter.speed_slow, shooter.speed_medium, shooter.speed_fast});
 	
 	// Select rotation speed from triggers
 	switch ((driver.trigger_one + driver.trigger_two)){

@@ -83,12 +83,6 @@ frc::Rotation2d SwerveModule::getAngle() {
 
 frc::SwerveModuleState SwerveModule::Optimize(const frc::SwerveModuleState& desiredState, const frc::Rotation2d& currentAngle, bool optimize){
 	return optimize ? frc::SwerveModuleState::Optimize(desiredState, getAngle()) : frc::SwerveModuleState{desiredState.speed,desiredState.angle};
-	
-	if(optimize){
-		return frc::SwerveModuleState::Optimize(desiredState, getAngle());
-	}else{
-		return frc::SwerveModuleState{desiredState.speed,desiredState.angle};
-	}
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& desiredState) {
