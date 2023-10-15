@@ -34,6 +34,8 @@ void Robot::RobotInit() {
 }
 void Robot::RobotPeriodic() {
 
+	frc::SmartDashboard::PutNumber("Angle", static_cast<int>(gyro->GetYaw()));
+
 	robot_position = m_swerve.UpdateOdometry();
 
 }
@@ -75,12 +77,12 @@ void Robot::AutonomousPeriodic() {
 
 	#pragma region // Slot One
 	Task s1_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {1_fps,1_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {2_fps,2_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
 	Task s1_move_forward = {
-		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ m_swerve.Drive(DriveData {4_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
@@ -99,7 +101,7 @@ void Robot::AutonomousPeriodic() {
 
 	#pragma region // Slot Two
 	Task s2_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {2_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {1_fps}); }, 
 		[this](){ pass(); },
 		1, 6
 	};
@@ -117,12 +119,12 @@ void Robot::AutonomousPeriodic() {
 
 	#pragma region // Slot Three
 	Task s3_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {1_fps,-1_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {1_fps,-0.5_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
 	Task s3_move_forward = {
-		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ m_swerve.Drive(DriveData {4_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
@@ -158,7 +160,7 @@ void Robot::AutonomousPeriodic() {
 			break;
 	}
 	#pragma endregion
-	
+
 }
 
 void Robot::TeleopInit() {
@@ -166,8 +168,6 @@ void Robot::TeleopInit() {
 	frc::SmartDashboard::PutString("Match State","   TeleOperated");
 
 	m_swerve.SetNeutralMode(Brake);
-	
-	gyro->Reset();
 
 }
 void Robot::TeleopPeriodic() {
@@ -204,9 +204,9 @@ void Robot::TeleopPeriodic() {
 	}
 
 	// Apply deadbands and slew rate limiters
-	forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(driver.forward, 0.2)) * driver.throttle) * Swordtip::Velocity::Maximums::Max_Speed;
-	strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(driver.strafe, 0.2)) * driver.throttle) * Swordtip::Velocity::Maximums::Max_Speed;
-	rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(driver.rotate, 0.3)) * sqrt(driver.throttle)) * rotation_speed;
+	forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(driver.forward, 0.1)) * driver.throttle) * Swordtip::Velocity::Maximums::True_Max_Speed;
+	strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(driver.strafe, 0.1)) * driver.throttle) * Swordtip::Velocity::Maximums::True_Max_Speed;
+	rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(driver.rotate, 0.1)) * sqrt(driver.throttle)) * rotation_speed;
 
 	// Drive the swerve modules
 	if(driver.emergency_stop){
@@ -220,7 +220,6 @@ void Robot::TeleopPeriodic() {
 	// Put values to SmartDashboard
 	frc::SmartDashboard::PutNumber("throttle", driver.throttle);
 	
-	frc::SmartDashboard::PutNumber("Angle", static_cast<int>(gyro->GetYaw()));
 	frc::SmartDashboard::PutNumber("X_POS", robot_position.X().value());
 	frc::SmartDashboard::PutNumber("Y_POS", robot_position.Y().value());
 

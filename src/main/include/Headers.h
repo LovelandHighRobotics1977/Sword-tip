@@ -24,6 +24,7 @@
 #include <units/length.h>
 #include <units/angle.h>
 #include <units/dimensionless.h>
+#include <units/math.h>
 
 // motors and CAN devices
 #include <ctre/Phoenix.h>
@@ -56,7 +57,6 @@ namespace Swordtip{
 	*/
 	namespace Misc {
 		static constexpr auto Robot_Name = "   1977 : Swordtip";
-		static constexpr double Drive_Gear_Ratio = 6.75; 										//	Gear ratio is L2 6.75:1
 		static constexpr double Conversion_Factor = 4096.0/ 360.0;
 	}
 	
@@ -65,35 +65,47 @@ namespace Swordtip{
 	*/
 	namespace Frame {
 		namespace Measurments {
-			static constexpr units::meter_t Length = 26_in;  									//  |Front left| frame to |rear left| frame
-			static constexpr units::meter_t Width = 26_in;  									//  |Front left| frame to |front right| frame
+			static constexpr units::inch_t Length = 26_in;  									//  |Front left| frame to |rear left| frame
+			static constexpr units::inch_t Width = 26_in;  										//  |Front left| frame to |front right| frame
 
-			static constexpr units::meter_t Length_Offset = 2.625_in;  							//  distance from edge of frame to wheel
-			static constexpr units::meter_t Width_Offset = 2.625_in;  							//  distance from edge of frame to wheel
+			static constexpr units::inch_t Length_Offset = 2.625_in;  							//  distance from edge of frame to wheel
+			static constexpr units::inch_t Width_Offset = 2.625_in;  							//  distance from edge of frame to wheel
 
-			static constexpr units::meter_t Length_Location = ((Length/2)-Length_Offset);		//	distance from center to wheel |Left / Right|
-			static constexpr units::meter_t Width_Location = ((Width/2)-Width_Offset);			//	distance from center to wheel |Front / Back|
+			static constexpr units::inch_t Length_Location = ((Length/2)-Length_Offset);		//	distance from center to wheel |Left / Right|
+			static constexpr units::inch_t Width_Location = ((Width/2)-Width_Offset);			//	distance from center to wheel |Front / Back|
+			
+			static const auto Turning_Circle = units::foot_t{((2 * M_PI) * std::sqrt((std::pow(2 * Frame::Measurments::Length_Location.value(), 2) + std::pow(2 * Frame::Measurments::Width_Location.value(), 2))))/12};
 		}
 		namespace RotationPoints {
 			static constexpr frc::Translation2d Center = {0_in,0_in};   						//  position of the center of the robot
 			static constexpr frc::Translation2d Tower = {-10.5_in,0_in};						//  position of the robot tower
-		}					
+		}	
+		namespace ModuleStats {
+			static constexpr double Drive_RPMs = 6380;
+			static constexpr units::inch_t Wheel_Radius = 2_in;
+			static constexpr double Drive_Gear_Ratio = 6.75;
+		}				
 	}
 	/**
 	 * Velocity maximums and presets
 	*/
 	namespace Velocity {
+		/**
+		 * Velocity Maximums
+		*/
 		namespace Maximums {
-			static constexpr units::feet_per_second_t Max_Speed = 11_fps;                		//  max horizontal velocity 16.3 feet per second
-			static constexpr units::degrees_per_second_t Max_Rotation = 420_deg_per_s;   		//  max rotational velocity ~763 degrees per second
+			// Max horizontal velocity of ~16 feet per second
+			static const units::feet_per_second_t True_Max_Speed = (((Frame::ModuleStats::Drive_RPMs / Frame::ModuleStats::Drive_Gear_Ratio) * (2 * Frame::ModuleStats::Wheel_Radius * M_PI))/60);
+			// Max rotational velocity of ~773 degrees per second
+			static const units::degrees_per_second_t True_Max_Rotation = 360 * ((True_Max_Speed) / (Frame::Measurments::Turning_Circle));
 		}
 		/**
 		 * Rotational velocity presets
 		*/
 		namespace Rotation {
-			static constexpr units::degrees_per_second_t Slow =  Maximums::Max_Rotation / 3;    //  140 degrees per second
-			static constexpr units::degrees_per_second_t Medium = Maximums::Max_Rotation / 2;   //  210 degrees per second
-			static constexpr units::degrees_per_second_t Fast = Maximums::Max_Rotation;  		//  420 degrees per second
+			static const units::degrees_per_second_t Slow =  Maximums::True_Max_Rotation / 3;    		//  257 degrees per second
+			static const units::degrees_per_second_t Medium = Maximums::True_Max_Rotation / 2;   		//  386 degrees per second
+			static const units::degrees_per_second_t Fast = Maximums::True_Max_Rotation;  				//  773 degrees per second
 		}
 	}
 
@@ -138,7 +150,7 @@ struct DriveData{
 	units::feet_per_second_t forward = 0_fps;
 	units::feet_per_second_t strafe = 0_fps;
 	units::angular_velocity::degrees_per_second_t rotate = 0_deg_per_s;
-	bool fieldOriented = 0;
+	bool field_oriented = true;
 	frc::Translation2d centerOfRotation = Swordtip::Frame::RotationPoints::Center;
 };
 
