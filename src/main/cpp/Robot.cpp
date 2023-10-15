@@ -93,12 +93,12 @@ void Robot::AutonomousPeriodic() {
 
 	#pragma region RED SHORT
 	Task short_RED_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {1_fps,-0.5_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {2_fps,-1_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
 	Task short_RED_move_forward = {
-		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ m_swerve.Drive(DriveData {4_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
@@ -116,9 +116,10 @@ void Robot::AutonomousPeriodic() {
 	};
 	#pragma endregion RED SHORT
 
+
 	#pragma region RED MIDDLE
 	Task middle_RED_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {1_fps}); }, 
 		[this](){ pass(); },
 		1, 6
 	};
@@ -137,12 +138,12 @@ void Robot::AutonomousPeriodic() {
 
 	#pragma region RED LONG
 	Task long_RED_leave_zone = {
-		[this](){ m_swerve.Drive(DriveData {1_fps,0.2_fps}); }, 
+		[this](){ m_swerve.Drive(DriveData {1_fps,-0.5_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
 	Task long_RED_move_forward = {
-		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ m_swerve.Drive(DriveData {4_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
@@ -298,7 +299,6 @@ void Robot::AutonomousPeriodic() {
 
 	}
 	#pragma endregion EXECUTE
-
 }
 
 void Robot::TeleopInit() {
@@ -342,9 +342,9 @@ void Robot::TeleopPeriodic() {
 	}
 
 	// Apply deadbands and slew rate limiters
-	forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(driver.forward, 0.2)) * driver.throttle) * Swordtip::Velocity::Maximums::Max_Speed;
-	strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(driver.strafe, 0.2)) * driver.throttle) * Swordtip::Velocity::Maximums::Max_Speed;
-	rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(driver.rotate, 0.3)) * sqrt(driver.throttle)) * rotation_speed;
+	forward = (-m_forwardLimiter.Calculate(frc::ApplyDeadband(driver.forward, 0.1)) * driver.throttle) * Swordtip::Velocity::Maximums::True_Max_Speed;
+	strafe = (-m_strafeLimiter.Calculate(frc::ApplyDeadband(driver.strafe, 0.1)) * driver.throttle) * Swordtip::Velocity::Maximums::True_Max_Speed;
+	rotate = (-m_rotateLimiter.Calculate(frc::ApplyDeadband(driver.rotate, 0.1)) * sqrt(driver.throttle)) * rotation_speed;
 
 	// Drive the swerve modules
 	if(driver.emergency_stop){

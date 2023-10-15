@@ -72,7 +72,7 @@ SwerveModule::SwerveModule(const int driveMotorID,     const int angleMotorID,  
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() {
-	auto distance = (((2 * M_PI * 2) / Swordtip::Misc::Drive_Gear_Ratio ) / 2048) * m_driveMotor.GetSelectedSensorPosition();
+	auto distance = (((2 * M_PI * 2) / Swordtip::Frame::ModuleStats::Drive_Gear_Ratio ) / 2048) * m_driveMotor.GetSelectedSensorPosition();
 	auto angle = ((2 * M_PI) / 360) * m_angleEncoder.GetAbsolutePosition();
 	return {units::meter_t{distance}, units::degree_t{angle}};
 }

@@ -9,9 +9,9 @@ void Drivetrain::Drive(DriveData data) {
 	field_oriented_speeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(frc::ChassisSpeeds{data.forward, data.strafe, data.rotate}, gyro->GetRotation2d());
 	robot_oriented_speeds = frc::ChassisSpeeds{data.forward, data.strafe, data.rotate};
 	
-	auto states = m_kinematics.ToSwerveModuleStates(data.field_oriented ? field_oriented_speeds : robot_oriented_speeds,data.centerOfRotation);
+	auto states = m_kinematics.ToSwerveModuleStates(data.field_oriented ? field_oriented_speeds : robot_oriented_speeds, data.centerOfRotation);
 
-	m_kinematics.DesaturateWheelSpeeds(&states, Swordtip::Velocity::Maximums::Max_Speed);
+	m_kinematics.DesaturateWheelSpeeds(&states, Swordtip::Velocity::Maximums::True_Max_Speed);
 
 	auto [rl, fl, fr, rr] = states;
 
@@ -36,7 +36,7 @@ DriveData Drivetrain::AutoBalance(double angles[5], double speeds[5], double cur
 		chosen_speed = -speeds[angle_threshold];
 	}
 
-	return(DriveData {0_fps,Swordtip::Velocity::Maximums::Max_Speed * chosen_speed});
+	return(DriveData {0_fps,Swordtip::Velocity::Maximums::True_Max_Speed * chosen_speed});
 }
 
 void Drivetrain::SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode mode){
