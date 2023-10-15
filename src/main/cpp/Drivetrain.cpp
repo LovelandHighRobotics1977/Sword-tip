@@ -6,8 +6,8 @@
 
 void Drivetrain::Drive(DriveData data) {
 	
-	field_oriented_speeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(frc::ChassisSpeeds{data.forward, data.strafe, data.rotate}, gyro->GetRotation2d());
-	robot_oriented_speeds = frc::ChassisSpeeds{data.forward, data.strafe, data.rotate};
+	field_oriented_speeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(frc::ChassisSpeeds{data.forward, -data.strafe, data.rotate}, gyro->GetRotation2d());
+	robot_oriented_speeds = frc::ChassisSpeeds{data.forward, -data.strafe, data.rotate};
 	
 	auto states = m_kinematics.ToSwerveModuleStates(data.field_oriented ? field_oriented_speeds : robot_oriented_speeds, data.centerOfRotation);
 
