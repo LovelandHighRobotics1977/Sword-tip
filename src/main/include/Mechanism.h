@@ -44,7 +44,7 @@ class Mechanism {
             * @note
             * Fast -> Best for high nodes (more challenging to hit)
 		*/
-        void SetSpeed(bool slow, bool medium, bool fast);
+        void SetSpeed(ArmData target);
 
         int speed = 0;
 

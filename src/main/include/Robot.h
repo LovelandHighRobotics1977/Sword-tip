@@ -53,18 +53,21 @@ class Robot : public frc::TimedRobot {
 
 // Auto Variables
 
+	// Autolevel variables
 		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
 		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
 
-		// THE IMPORTANT ONE
-
-		int auto_mode = 3;
+		SelectedAuto Auto = {
+			HIGH,
+			LONG,
+			BLUE
+		};
 
 // Teleop variables
 
-		frc::Translation2d center_of_rotation = {0_m,0_m};
+		frc::Translation2d center_of_rotation = Swordtip::Frame::RotationPoints::Center;
 
-		units::degrees_per_second_t rotation_speed = 0_deg_per_s;
+		units::degrees_per_second_t rotation_speed = Swordtip::Velocity::Rotation::None;
 
 		units::velocity::feet_per_second_t forward;
 		units::velocity::feet_per_second_t strafe;

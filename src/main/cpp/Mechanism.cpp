@@ -71,14 +71,14 @@ void Mechanism::SetIntake(bool in, bool out){
 		m_IntakeMotor.Set(0);
 	}
 }
-void Mechanism::SetSpeed(bool slow, bool medium, bool fast){
-	if(slow){
+void Mechanism::SetSpeed(ArmData target){
+	if(target.Target[0]){
 		speed = 1;
 	}
-	else if(medium){
+	else if(target.Target[1]){
 		speed = 2;
 	}
-	else if(fast){
+	else if(target.Target[2]){
 		speed = 3;
 	}
 }

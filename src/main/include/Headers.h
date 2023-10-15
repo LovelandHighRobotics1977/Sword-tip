@@ -103,9 +103,10 @@ namespace Swordtip{
 		 * Rotational velocity presets
 		*/
 		namespace Rotation {
-			static const units::degrees_per_second_t Slow =  Maximums::True_Max_Rotation / 3;    		//  257 degrees per second
-			static const units::degrees_per_second_t Medium = Maximums::True_Max_Rotation / 2;   		//  386 degrees per second
-			static const units::degrees_per_second_t Fast = Maximums::True_Max_Rotation;  				//  773 degrees per second
+			static constexpr units::degrees_per_second_t None = 0_deg_per_s;  					//  0 degrees per second
+			static constexpr units::degrees_per_second_t Slow =  Maximums::Max_Rotation / 3;    //  140 degrees per second
+			static constexpr units::degrees_per_second_t Medium = Maximums::Max_Rotation / 2;   //  210 degrees per second
+			static constexpr units::degrees_per_second_t Fast = Maximums::Max_Rotation;  		//  420 degrees per second
 		}
 	}
 
@@ -179,6 +180,66 @@ struct Task{
 	const std::function<void()>& end_function;
 	double start_time = 0;
 	double end_time = 15;
+};
+
+/**
+ * Data for setting the arm speed
+ * @param LOW Aim low?
+ * @param MID Aim mid?
+ * @param HIGH Aim high?
+*/
+struct ArmData {
+	bool Target[3] = {false,false,false};
+};
+
+
+// Variables to make shit look nice
+
+static constexpr int UNSET = 0; // Not on a team :(
+static constexpr int GREEN = 0; // OH FUCK
+static constexpr int RED = 1; // RED team!
+static constexpr int BLUE = 2; // BLUE team!
+
+static constexpr int SIT = 0; // Sit still and do nothing
+static constexpr int SHORT = 1; // Take a wide radius around the charge station and skedaddle
+static constexpr int MIDDLE = 2; // Go over the charge station at a slow speed
+static constexpr int LONG = 3; // Take a small distance to squeeze by the charge station and skedaddle.  Closest to opponent human player
+
+static constexpr ArmData NONE = {false,false,false}; // Aim nowhere :(
+static constexpr ArmData LOW = {1, false, false}; // Aim for a low node (WILL hit low 100% of the time)
+static constexpr ArmData MID = {false, 1, false}; // Aim for a mid node (Finicky, 20% success rate)
+static constexpr ArmData HIGH = {false, false, 1}; // Aim for high node (Consistent, 90% success rate)
+
+/**
+ * Autonomous selector data
+ * @param node Node to aim at (LOW, MID, HIGH)
+ * @param path Auto to execute (SHORT, MID, LONG)
+ * @param alliance Our alliance color (RED, BLUE)
+*/
+struct SelectedAuto {
+	/**
+		 * @param NONE Do not shoot :(
+		 * @param LOW Aim for a low node (WILL hit low 100% of the time)
+		 * @param MID Aim for a mid node (Finicky, 20% success rate)
+		 * @param HIGH Aim for high node (Consistent, 90% success rate)
+	*/
+	ArmData node = NONE;
+
+	/**
+		 * @param SIT Sit still and do absolutely nothing for 15 seconds :(
+		 * @param SHORT Take a wide radius around the charge station and skedaddle
+		 * @param MIDDLE Go over the charge station at a slow speed
+		 * @param LONG Take a small distance to squeeze by the charge station and skedaddle.  Closest to opponent human player
+	*/
+	int path = SIT;
+
+	/**
+		 * @param UNSET No team :(
+		 * @param GREEN OH FUCK
+		 * @param RED RED TEAM !!!
+		 * @param BLUE BLOOOOO TEAM !!!
+	*/
+	int alliance = UNSET;
 };
 
 #endif /* !HEADERS_H */
