@@ -169,4 +169,12 @@ struct Task{
 	double end_time = 15;
 };
 
+
+// Variables to make shit look nice
+static constexpr int UNSET = 0;
+static constexpr int GREEN = 0;
+static constexpr int RED = 1;
+static constexpr int BLUE = 2;
+
+
 #endif /* !HEADERS_H */

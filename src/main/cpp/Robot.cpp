@@ -51,115 +51,247 @@ void Robot::ExecuteTask(double current_time, Task task){
 }
 
 void Robot::AutonomousInit() {
-
 	frc::SmartDashboard::PutString("Match State","   Autonomous");
 
-	m_swerve.Drive(DriveData {});
+	// Autonomous mode specific configs
 	m_swerve.SetNeutralMode(Brake);
+	m_swerve.Drive(DriveData {});
 	m_swerve.ResetOdometry({0_m,0_m,0_deg});
-
 	m_cubeArm.SetSpeed(0,1,0);
-	
-	timer.Restart();
 
+	// Prepare timer and gyro for auto
+	timer.Restart();
 	gyro->Reset();
+
+	// Select which autonomous to do
+	auto_task = 1;
+	auto_alliance = RED;
 
 }
 void Robot::AutonomousPeriodic() {
 
-	#pragma region // Common
+	#pragma region COMMON
 	Task fire_cube = {
 		[this](){ m_cubeArm.SetIntake(0,1); }, 
 		[this](){ m_cubeArm.SetIntake(0,0); },
 		0, 1
 	};
-	#pragma endregion
+	#pragma endregion COMMON
 
-	#pragma region // Slot One
-	Task s1_leave_zone = {
+	#pragma region DO_NOTHING
+	Task do_nothing = {
+		[this](){ pass(); }, 
+		[this](){ pass(); },
+		0,15
+	};
+	Task do_nothing_auto[1] = {
+		do_nothing
+	};
+	#pragma endregion DO_NOTHING
+
+	#pragma region RED
+
+	#pragma region RED Slot ONE
+	Task s1_RED_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {1_fps,1_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
-	Task s1_move_forward = {
+	Task s1_RED_move_forward = {
 		[this](){ m_swerve.Drive(DriveData {3_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
-	Task s1_wait_for_teleop = {
+	Task s1_RED_wait_for_teleop = {
 		[this](){ m_swerve.Drive(DriveData {}); },
 		[this](){ pass(); },
 		3
 	};
-	Task s1_auto[4] = {
+	Task s1_RED_auto[4] = {
 		fire_cube,
-		s1_leave_zone,
-		s1_move_forward,
-		s1_wait_for_teleop
+		s1_RED_leave_zone,
+		s1_RED_move_forward,
+		s1_RED_wait_for_teleop
 	};
-	#pragma endregion
+	#pragma endregion RED Slot ONE
 
-	#pragma region // Slot Two
-	Task s2_leave_zone = {
+	#pragma region RED Slot TWO
+	Task s2_RED_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
 		[this](){ pass(); },
 		1, 6
 	};
-	Task s2_wait_for_teleop = {
+	Task s2_RED_wait_for_teleop = {
 		[this](){ m_swerve.Drive(DriveData {}); },
 		[this](){ pass(); },
 		6
 	};
-	Task s2_auto[3] = {
+	Task s2_RED_auto[3] = {
 		fire_cube,
-		s2_leave_zone,
-		s2_wait_for_teleop
+		s2_RED_leave_zone,
+		s2_RED_wait_for_teleop
 	};
-	#pragma endregion
+	#pragma endregion RED Slot TWO
 
-	#pragma region // Slot Three
-	Task s3_leave_zone = {
+	#pragma region RED Slot THREE
+	Task s3_RED_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {1_fps,-0.5_fps}); }, 
 		[this](){ pass(); },
 		1, 2
 	};
-	Task s3_move_forward = {
+	Task s3_RED_move_forward = {
 		[this](){ m_swerve.Drive(DriveData {3_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
-	Task s3_wait_for_teleop = {
+	Task s3_RED_wait_for_teleop = {
 		[this](){ m_swerve.Drive(DriveData {}); },
 		[this](){ pass(); },
 		3
 	};
-	Task s3_auto[4] = {
+	Task s3_RED_auto[4] = {
 		fire_cube,
-		s3_leave_zone,
-		s3_move_forward,
-		s3_wait_for_teleop
+		s3_RED_leave_zone,
+		s3_RED_move_forward,
+		s3_RED_wait_for_teleop
 	};
-	#pragma endregion
+	#pragma endregion RED Slot THREE
 
-	#pragma region // Execute Tasks
-	switch (auto_mode){
+	#pragma endregion RED
+
+	#pragma region BLUE
+
+	#pragma region BLUE Slot ONE
+	Task s1_BLUE_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {1_fps,-1_fps}); }, 
+		[this](){ pass(); },
+		1, 2
+	};
+	Task s1_BLUE_move_forward = {
+		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ pass(); },
+		2, 3
+	};
+	Task s1_BLUE_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		3
+	};
+	Task s1_BLUE_auto[4] = {
+		fire_cube,
+		s1_BLUE_leave_zone,
+		s1_BLUE_move_forward,
+		s1_BLUE_wait_for_teleop
+	};
+	#pragma endregion BLUE Slot ONE
+
+	#pragma region BLUE Slot TWO
+	Task s2_BLUE_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {0.9_fps}); }, 
+		[this](){ pass(); },
+		1, 6
+	};
+	Task s2_BLUE_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		6
+	};
+	Task s2_BLUE_auto[3] = {
+		fire_cube,
+		s2_BLUE_leave_zone,
+		s2_BLUE_wait_for_teleop
+	};
+	#pragma endregion BLUE Slot TWO
+
+	#pragma region BLUE Slot THREE
+	Task s3_BLUE_leave_zone = {
+		[this](){ m_swerve.Drive(DriveData {1_fps,0.5_fps}); }, 
+		[this](){ pass(); },
+		1, 2
+	};
+	Task s3_BLUE_move_forward = {
+		[this](){ m_swerve.Drive(DriveData {3_fps}); },
+		[this](){ pass(); },
+		2, 3
+	};
+	Task s3_BLUE_wait_for_teleop = {
+		[this](){ m_swerve.Drive(DriveData {}); },
+		[this](){ pass(); },
+		3
+	};
+	Task s3_BLUE_auto[4] = {
+		fire_cube,
+		s3_BLUE_leave_zone,
+		s3_BLUE_move_forward,
+		s3_BLUE_wait_for_teleop
+	};
+	#pragma endregion BLUE Slot THREE
+
+	#pragma endregion BLUE
+
+	#pragma region EXECUTE
+	switch (auto_alliance){
+		// RED TEAM
 		case 1:
-			for (int i = 0; i < (int) std::size(s1_auto); i++){
-				ExecuteTask(timer.Get().value(),s1_auto[i]);
+			switch (auto_task){
+				case 1:
+					for (int i = 0; i < (int) std::size(s1_RED_auto); i++){
+						ExecuteTask(timer.Get().value(),s1_RED_auto[i]);
+					}
+					break;
+				case 2:
+					for (int i = 0; i < (int) std::size(s2_RED_auto); i++){
+						ExecuteTask(timer.Get().value(),s2_RED_auto[i]);
+					}
+					break;
+				case 3:
+					for (int i = 0; i < (int) std::size(s3_RED_auto); i++){
+						ExecuteTask(timer.Get().value(),s3_RED_auto[i]);
+					}
+					break;
+				default:
+					for (int i = 0; i < (int) std::size(do_nothing_auto); i++){
+						ExecuteTask(timer.Get().value(),do_nothing_auto[i]);
+					}
+					break;
 			}
 			break;
+
+		// BLUE TEAM
+		
 		case 2:
-			for (int i = 0; i < (int) std::size(s2_auto); i++){
-				ExecuteTask(timer.Get().value(),s2_auto[i]);
+			switch (auto_task){
+				case 1:
+					for (int i = 0; i < (int) std::size(s1_BLUE_auto); i++){
+						ExecuteTask(timer.Get().value(),s1_BLUE_auto[i]);
+					}
+					break;
+				case 2:
+					for (int i = 0; i < (int) std::size(s2_BLUE_auto); i++){
+						ExecuteTask(timer.Get().value(),s2_BLUE_auto[i]);
+					}
+					break;
+				case 3:
+					for (int i = 0; i < (int) std::size(s3_BLUE_auto); i++){
+						ExecuteTask(timer.Get().value(),s3_BLUE_auto[i]);
+					}
+					break;
+				default:
+					for (int i = 0; i < (int) std::size(do_nothing_auto); i++){
+						ExecuteTask(timer.Get().value(),do_nothing_auto[i]);
+					}
+					break;
 			}
 			break;
-		case 3:
-			for (int i = 0; i < (int) std::size(s3_auto); i++){
-				ExecuteTask(timer.Get().value(),s3_auto[i]);
+
+		default:
+			for (int i = 0; i < (int) std::size(do_nothing_auto); i++){
+				ExecuteTask(timer.Get().value(),do_nothing_auto[i]);
 			}
 			break;
+
 	}
-	#pragma endregion
+	#pragma endregion EXECUTE
 
 }
 

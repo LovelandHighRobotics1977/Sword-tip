@@ -56,9 +56,22 @@ class Robot : public frc::TimedRobot {
 		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
 		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
 
-		// THE IMPORTANT ONE
+// AUTO SELECTORS
 
-		int auto_mode = 3;
+		/**
+		 * @param 0 Do absolutely nothing for 15 seconds
+		 * @param 1 Take a wide radius around the charge station and skedaddle
+		 * @param 2 Go over the charge station at a slow speed
+		 * @param 3 Take a small distance to squeeze by the charge station and skedaddle.  Closest to opponent human player
+		*/
+		int auto_task = 0;
+
+		/**
+		 * @param UNSET Do nothing because we are not on a team
+		 * @param RED We are on the RED alliance do red auto
+		 * @param BLUE We are on the BLUE alliance do blue auto
+		*/
+		int auto_alliance = GREEN;
 
 // Teleop variables
 
