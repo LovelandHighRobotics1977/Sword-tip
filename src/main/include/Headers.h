@@ -74,7 +74,7 @@ namespace Swordtip{
 			static constexpr units::inch_t Length_Location = ((Length/2)-Length_Offset);		//	distance from center to wheel |Left / Right|
 			static constexpr units::inch_t Width_Location = ((Width/2)-Width_Offset);			//	distance from center to wheel |Front / Back|
 			
-			static const auto Turning_Circle = units::foot_t{((2 * M_PI) * std::sqrt((std::pow(2 * Frame::Measurments::Length_Location.value(), 2) + std::pow(2 * Frame::Measurments::Width_Location.value(), 2))))/12};
+			static const units::foot_t Turning_Circle = units::foot_t{((2 * M_PI) * std::sqrt((std::pow(2 * Frame::Measurments::Length_Location.value(), 2) + std::pow(2 * Frame::Measurments::Width_Location.value(), 2))))/12};
 		}
 		namespace RotationPoints {
 			static constexpr frc::Translation2d Center = {0_in,0_in};   						//  position of the center of the robot
@@ -95,18 +95,18 @@ namespace Swordtip{
 		*/
 		namespace Maximums {
 			// Max horizontal velocity of ~16 feet per second
-			static const units::feet_per_second_t True_Max_Speed = (((Frame::ModuleStats::Drive_RPMs / Frame::ModuleStats::Drive_Gear_Ratio) * (2 * Frame::ModuleStats::Wheel_Radius * M_PI))/60);
+			static constexpr auto True_Max_Speed = units::feet_per_second_t{(((2 * Frame::ModuleStats::Wheel_Radius * M_PI) * (Frame::ModuleStats::Drive_RPMs / Frame::ModuleStats::Drive_Gear_Ratio))/ 60 / 12).value()};
 			// Max rotational velocity of ~773 degrees per second
-			static const units::degrees_per_second_t True_Max_Rotation = 360 * ((True_Max_Speed) / (Frame::Measurments::Turning_Circle));
+			static const auto True_Max_Rotation = units::degrees_per_second_t{(360 * ((True_Max_Speed) / (Frame::Measurments::Turning_Circle))).value()};
 		}
 		/**
 		 * Rotational velocity presets
 		*/
 		namespace Rotation {
-			static constexpr units::degrees_per_second_t None = 0_deg_per_s;  					//  0 degrees per second
-			static constexpr units::degrees_per_second_t Slow =  Maximums::Max_Rotation / 3;    //  140 degrees per second
-			static constexpr units::degrees_per_second_t Medium = Maximums::Max_Rotation / 2;   //  210 degrees per second
-			static constexpr units::degrees_per_second_t Fast = Maximums::Max_Rotation;  		//  420 degrees per second
+			static const units::degrees_per_second_t None = 0_deg_per_s;  						//  0 degrees per second
+			static const units::degrees_per_second_t Slow =  Maximums::True_Max_Rotation / 3;   //  260 degrees per second
+			static const units::degrees_per_second_t Medium = Maximums::True_Max_Rotation / 2;  //  370 degrees per second
+			static const units::degrees_per_second_t Fast = Maximums::True_Max_Rotation;  		//  770 degrees per second
 		}
 	}
 
@@ -169,6 +169,16 @@ struct OdometryData{
 };
 
 /**
+ * Data for setting the arm speed
+ * @param LOW Aim low?
+ * @param MID Aim mid?
+ * @param HIGH Aim high?
+*/
+struct ArmData {
+	bool Target[3] = {false,false,false};
+};
+
+/**
  * Data for an autonomous task
  * @param start_function the function to execute at the start time
  * @param end_function the function to execute at the end time
@@ -180,16 +190,6 @@ struct Task{
 	const std::function<void()>& end_function;
 	double start_time = 0;
 	double end_time = 15;
-};
-
-/**
- * Data for setting the arm speed
- * @param LOW Aim low?
- * @param MID Aim mid?
- * @param HIGH Aim high?
-*/
-struct ArmData {
-	bool Target[3] = {false,false,false};
 };
 
 
@@ -205,7 +205,7 @@ static constexpr int SHORT = 1; // Take a wide radius around the charge station 
 static constexpr int MIDDLE = 2; // Go over the charge station at a slow speed
 static constexpr int LONG = 3; // Take a small distance to squeeze by the charge station and skedaddle.  Closest to opponent human player
 
-static constexpr ArmData NONE = {false,false,false}; // Aim nowhere :(
+static constexpr ArmData NONE = {false,false,false}; // Aim nowhere and do not shoot :(
 static constexpr ArmData LOW = {1, false, false}; // Aim for a low node (WILL hit low 100% of the time)
 static constexpr ArmData MID = {false, 1, false}; // Aim for a mid node (Finicky, 20% success rate)
 static constexpr ArmData HIGH = {false, false, 1}; // Aim for high node (Consistent, 90% success rate)

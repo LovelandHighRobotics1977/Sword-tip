@@ -116,7 +116,6 @@ void Robot::AutonomousPeriodic() {
 	};
 	#pragma endregion RED SHORT
 
-
 	#pragma region RED MIDDLE
 	Task middle_RED_leave_zone = {
 		[this](){ m_swerve.Drive(DriveData {1_fps}); }, 
@@ -299,6 +298,7 @@ void Robot::AutonomousPeriodic() {
 
 	}
 	#pragma endregion EXECUTE
+
 }
 
 void Robot::TeleopInit() {
