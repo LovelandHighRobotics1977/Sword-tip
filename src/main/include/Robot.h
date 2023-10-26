@@ -29,8 +29,8 @@ class Robot : public frc::TimedRobot {
 
 	private:
 
-		Control::Drive driver{};
-		Control::Mechanism shooter{};
+		Control::Drive driver{0};
+		Control::Mechanism shooter{1};
 
 		cs::UsbCamera r_driveCam;
 		cs::UsbCamera r_armCam;
@@ -57,11 +57,7 @@ class Robot : public frc::TimedRobot {
 		double threshold_angles[5] = {  30,   20,   10,    5,    2};  // Threshold angles in degrees
 		double speed_multiplier[5] = {0.18, 0.08, 0.05, 0.03, 0.00};  // Associated motor speeds
 
-		SelectedAuto Auto = {
-			HIGH,
-			LONG,
-			BLUE
-		};
+		SelectedAuto Auto;
 
 // Teleop variables
 

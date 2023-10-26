@@ -35,6 +35,7 @@
 // frc inputs
 #include <frc/MathUtil.h> // for frc::ApplyDeadband
 #include <frc/XboxController.h>
+#include <frc/PS4Controller.h>
 #include <frc/Joystick.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/GenericHID.h>

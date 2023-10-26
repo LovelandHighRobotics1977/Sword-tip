@@ -62,6 +62,11 @@ void Robot::AutonomousInit() {
 	timer.Restart();
 	gyro->Reset();
 
+	Auto = {
+		HIGH,
+		SHORT,
+		RED
+	};
 }
 void Robot::AutonomousPeriodic() {
 
@@ -98,7 +103,7 @@ void Robot::AutonomousPeriodic() {
 		1, 2
 	};
 	Task short_RED_move_forward = {
-		[this](){ m_swerve.Drive(DriveData {4_fps}); },
+		[this](){ m_swerve.Drive(DriveData {2_fps}); },
 		[this](){ pass(); },
 		2, 3
 	};
